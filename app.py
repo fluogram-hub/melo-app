@@ -6,43 +6,41 @@ from google.oauth2 import service_account
 from PIL import Image
 
 # =========================================================
-# 1. ADN & BIBLE B22 (LOCKS)
+# 1. ADN & VERROUS TECHNIQUES (B22)
 # =========================================================
-DNA_MELO = "Bunny-shaped high-end designer toy, blue glass suit (transparent blue glass effect), ultra-glossy. White round belly with yellow notes, white mitten-like paws. Rounded child proportions."
-DNA_PIPO = "Microscopic snow-potato companion; white iridescent reflections. Tiny scale (5-10% of Melo). Soft constant glow."
-TECH_LOCKS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera perspective, ray-traced lighting."
+DNA_MELO = "Bunny-shaped high-end designer toy, blue glass suit, ultra-glossy. Rounded child proportions."
+DNA_PIPO = "Microscopic snow-potato companion; iridescent reflections. Soft constant glow."
+TECH_LOCKS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera perspective."
 
 # =========================================================
-# 2. STRUCTURE DES DONNÉES (COQUE VIDE)
+# 2. STRUCTURES DE DONNÉES (COQUES VIDES)
 # =========================================================
-# Ces dictionnaires sont les réceptacles. On ne les remplit pas ici.
 DB_DECORS = {
-    "votre_destination": {
-        "nom_fr": "Exemple Destination", "landmark_en": "Landmark",
+    "eiffel_paris": {
+        "nom_fr": "La Tour Eiffel (Paris, France)", "landmark_en": "Eiffel Tower",
         "decors": {
-            1: {"fr": "Lieu 1 FR", "en": "Lieu 1 EN", "cue": "Plate Cue 1"},
-            2: {"fr": "Lieu 2 FR", "en": "Lieu 2 EN", "cue": "Plate Cue 2"},
-            3: {"fr": "Lieu 3 FR", "en": "Lieu 3 EN", "cue": "Plate Cue 3"},
-            4: {"fr": "Lieu 4 FR", "en": "Lieu 4 EN", "cue": "Plate Cue 4"}
+            1: {"fr": "Le Trocadéro", "en": "The Trocadéro", "cue": "Eiffel Tower in background..."},
+            2: {"fr": "Les Quais de Seine", "en": "The Seine banks", "cue": "..."},
+            3: {"fr": "Au pied de la Tour", "en": "At the foot of the Tower", "cue": "..."},
+            4: {"fr": "Pelouse du Champ-de-Mars", "en": "Champ-de-Mars Lawn", "cue": "..."}
         }
     }
 }
 
+# La structure PLAN intègre maintenant les 8 variables Image pour la synchro Auto
 PLANS_SEQ = {
-    1: {"Angle": "wide-angle lens", "Light": "Golden Hour", "AM": "Melo Action", "AP": "Pipo Action", "Mode": "Perfect loop"},
-    # La structure attend 20 entrées ici
-}
-
-MAT_MAP = {
-    "🍭 SUCRERIES": {"Marshmallow foam": "Marshmallow foam", "Jelly candy": "Jelly candy"},
-    "🧶 TEXTILES": {"Felted wool": "Felted wool"},
-    "🧩 JOUETS": {"Lego": "Lego"}
+    1: {
+        "Angle": "wide-angle lens", "Light": "Golden Hour", 
+        "M_Pose": "relaxed sitting", "M_Expr": "curious", 
+        "P_Pose": "floating", "P_Pos": "near head",
+        "Acc": "none", "Palette": "Natural", "P_Col": "Iridescent White", "Trail": "Soft glow"
+    }
 }
 
 # =========================================================
-# 3. CONFIGURATION UI & SIDEBAR
+# 3. CONFIGURATION UI
 # =========================================================
-st.set_page_config(page_title="Melo Cockpit V67", layout="wide")
+st.set_page_config(page_title="Melo integrated Cockpit V68", layout="wide")
 
 with st.sidebar:
     st.title("🎬 STUDIO MÉLO")
@@ -52,112 +50,101 @@ with st.sidebar:
     v_id = st.selectbox("DESTINATION (B9)", list(DB_DECORS.keys()), format_func=lambda x: DB_DECORS[x]['nom_fr'])
     p_id = st.select_slider("NUMÉRO DU PLAN", options=list(range(1, 21)))
     
-    # Logique de synchro
     ville = DB_DECORS[v_id]
-    plan = PLANS_SEQ.get(p_id, {"Angle": "wide-angle lens", "Light": "Golden Hour", "AM": "...", "AP": "...", "Mode": "..."})
+    plan = PLANS_SEQ.get(p_id, PLANS_SEQ[1])
     auto_b5_id = ((p_id - 1) % 4) + 1
 
-# =========================================================
-# 4. COCKPIT PAR ONGLET
-# =========================================================
 tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (FOND)", "🎨 2. IMAGE (PERSOS)", "🎞️ 3. VIDÉO"])
 
-# --- ONGLET 1 : DÉCOR ---
+# =========================================================
+# 4. ONGLET 1 : DÉCOR (STABLE)
+# =========================================================
 with tab1:
-    st.subheader(f"⚙️ Pilotage du Décor")
+    st.subheader("⚙️ Pilotage du Décor")
     c1, c2, c3 = st.columns(3)
     with c1:
-        # B5 (Lieu)
         b5_opts = list(ville['decors'].keys())
         b5_val = st.selectbox("LIEU PRÉCIS (E5)", b5_opts, index=b5_opts.index(auto_b5_id) if auto_b5_id in b5_opts else 0, 
                               format_func=lambda x: ville['decors'][x]['fr'], disabled=not e7_bool)
-        # B6 (Angle)
-        ang_opts = ["wide-angle lens", "medium framing", "macro lens", "ground perspective"]
-        b6_idx = ang_opts.index(plan['Angle']) if plan['Angle'] in ang_opts else 0
-        b6_val = st.selectbox("ANGLE (B6/I34)", ang_opts, index=b6_idx, disabled=not e7_bool)
-    
+        cam_opts = ["wide-angle lens", "macro lens", "ground perspective", "eye-level"]
+        b6_val = st.selectbox("ANGLE (B6/I34)", cam_opts, index=cam_opts.index(plan['Angle']) if plan['Angle'] in cam_opts else 0, disabled=not e7_bool)
     with c2:
-        # B7 (Lumière)
         light_opts = ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"]
-        b7_idx = light_opts.index(plan['Light']) if plan['Light'] in light_opts else 0
-        b7_val = st.selectbox("LUMIÈRE (B7/I35)", light_opts, index=b7_idx, disabled=not e7_bool)
+        b7_val = st.selectbox("LUMIÈRE (B7/I35)", light_opts, index=light_opts.index(plan['Light']) if plan['Light'] in light_opts else 0, disabled=not e7_bool)
         b8_val = st.selectbox("AMBIANCE (B8)", ["calm", "mysterious", "joyful"], disabled=not e7_bool)
-        b11_val = st.selectbox("1ER PLAN (B11)", ["none", "flowers", "leaves"], disabled=not e7_bool)
-    
     with c3:
-        cat_d8 = st.selectbox("CATÉGORIE MATIÈRE", list(MAT_MAP.keys()), disabled=not e7_bool)
-        d8_name = st.selectbox("MATÉRIEL D8", list(MAT_MAP[cat_d8].keys()), disabled=not e7_bool)
-        d8_val = MAT_MAP[cat_d8][d8_name]
+        d8_val = st.selectbox("MATÉRIEL D8", ["Marshmallow foam", "Jelly candy", "Candy"], disabled=not e7_bool)
         d9_val = st.selectbox("MATÉRIEL D9", ["none", "frosted glass", "gold dust"], disabled=not e7_bool)
-        b10_val = st.text_input("SOL (B10)", value="dry and textured", disabled=not e7_bool)
-
-    # --- FORMULE XLSX PROMPT 1 ---
+    
+    # Formula Prompt 1
     e5_en = ville['decors'][b5_val]['en']
-    b12_cue = ville['decors'][b5_val]['cue']
-    d9_str = f" and {d9_val}" if d9_val != "none" else ""
-    b11_str = f"In the immediate foreground, a subtle {b11_val} adds volumetric depth; " if b11_val != "none" else ""
-    sugar = "sugar-coated crystalline textures" if "candy" in d8_val.lower() else "polished finishes"
-
-    prompt_1 = (
-        f"An ultra-detailed cinematic environment photography of {e5_en}. "
-        f"The scene is set in {ville['nom_fr']} during the {b7_val}, with a {b8_val} atmosphere. "
-        f"The camera uses a {b6_val}. {b11_str}"
-        f"MATERIAL WORLD & SHADING: All reimagined in {d8_val}{d9_str}. "
-        f"Surfaces feature realistic subsurface scattering and {sugar}. "
-        f"LIGHTING: Soft cinematic bokeh. GROUND: {b10_val}. "
-        f"PLATE CUES (STRICT): {b12_cue}. RULES: Pure background plate."
-    )
-    st.info("📝 PROMPT DÉCOR :")
+    prompt_1 = f"Environment: {e5_en}. Light: {b7_val}. Angle: {b6_val}. Material: {d8_val}. Pure background plate."
     st.code(prompt_1)
 
-# --- ONGLET 2 : PERSONNAGES ---
+# =========================================================
+# 5. ONGLET 2 : IMAGE (LES 8 SÉLECTEURS)
+# =========================================================
 with tab2:
-    st.subheader(f"🎨 Pilotage Mélo & Pipo")
-    ic1, ic2 = st.columns(2)
-    with ic1:
-        am_val = st.text_input("ACTION MÉLO (A_M)", value=plan['AM'], disabled=not e7_bool)
-        expr_val = st.selectbox("EXPRESSION", ["curious", "smiling", "amazed", "sleepy"], disabled=not e7_bool)
-    with ic2:
-        ap_val = st.text_input("ACTION PIPO (A_P)", value=plan['AP'], disabled=not e7_bool)
-        acc_val = st.text_input("ACCESSOIRE", value="none", disabled=not e7_bool)
+    st.subheader("🎨 Pilotage Mélo & Pipo")
+    
+    # Organisation en 4 colonnes pour les 8 sélecteurs
+    r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+    
+    with r1c1:
+        pose_m_opts = ["relaxed sitting", "standing curious", "walking", "dancing"]
+        s_pose_m = st.selectbox("1. Pose Mélo (FR)", pose_m_opts, 
+                                index=pose_m_opts.index(plan['M_Pose']) if plan['M_Pose'] in pose_m_opts else 0, disabled=not e7_bool)
+        
+        expr_m_opts = ["curious", "smiling", "amazed", "sleepy"]
+        s_expr_m = st.selectbox("2. Expression de Mélo", expr_m_opts, 
+                                index=expr_m_opts.index(plan['M_Expr']) if plan['M_Expr'] in expr_m_opts else 0, disabled=not e7_bool)
 
+    with r1c2:
+        pose_p_opts = ["floating", "orbiting", "static", "hiding"]
+        s_pose_p = st.selectbox("3. Pose Pipo (FR)", pose_p_opts, 
+                                index=pose_p_opts.index(plan['P_Pose']) if plan['P_Pose'] in pose_p_opts else 0, disabled=not e7_bool)
+        
+        pos_p_opts = ["near head", "on shoulder", "in front", "behind"]
+        s_pos_p = st.selectbox("4. Position Pipo (FR)", pos_p_opts, 
+                               index=pos_p_opts.index(plan['P_Pos']) if plan['P_Pos'] in pos_p_opts else 0, disabled=not e7_bool)
+
+    with r1c3:
+        s_acc = st.text_input("5. Melo Accessory", value=plan['Acc'], disabled=not e7_bool)
+        
+        pal_opts = ["Natural", "Pastel", "Vibrant", "Monochrome"]
+        s_pal = st.selectbox("6. Color Palette", pal_opts, 
+                             index=pal_opts.index(plan['Palette']) if plan['Palette'] in pal_opts else 0, disabled=not e7_bool)
+
+    with r1c4:
+        pcol_opts = ["Iridescent White", "Pure Pearl", "Golden Glow"]
+        s_pcol = st.selectbox("7. Pipo Color", pcol_opts, 
+                              index=pcol_opts.index(plan['P_Col']) if plan['P_Col'] in pcol_opts else 0, disabled=not e7_bool)
+        
+        trail_opts = ["Soft glow", "Ribbon of light", "Sparkles", "none"]
+        s_trail = st.selectbox("8. Pipo energy trail", trail_opts, 
+                               index=trail_opts.index(plan['Trail']) if plan['Trail'] in trail_opts else 0, disabled=not e7_bool)
+
+    # --- FORMULE MAÎTRESSE PROMPT 2 ---
     prompt_2 = (
         f"A high-end cinematic character photography of MÉLO and PIPO. "
-        f"{DNA_MELO} ACTION: {am_val}. EXPRESSION: {expr_val}. "
-        f"{DNA_PIPO} ACTION: {ap_val}. INTEGRATION: Placed in {e5_en}. {TECH_LOCKS}"
+        f"{DNA_MELO} POSE: {s_pose_m}. EXPRESSION: {s_expr_m}. ACCESSORY: {s_acc}. "
+        f"{DNA_PIPO} POSE: {s_pose_p}. POSITION: {s_pos_p}. "
+        f"STYLE: Palette {s_pal}. Pipo Color: {s_pcol}. Trail: {s_trail}. "
+        f"INTEGRATION: Placed in {e5_en} ({ville['nom_fr']}). {TECH_LOCKS}"
     )
     st.info("📝 PROMPT PERSONNAGES :")
     st.code(prompt_2)
 
-# --- ONGLET 3 : VIDÉO ---
+# =========================================================
+# 6. ONGLET 3 : VIDÉO (STABLE)
+# =========================================================
 with tab3:
     st.subheader("🎞️ Paramètres d'Animation")
-    vc1, vc2 = st.columns(2)
-    with vc1:
-        v_mode = st.selectbox("MODE VIDÉO", ["Perfect loop", "Cinematic non-loop"], 
-                              index=0 if plan['Mode'] == "Perfect loop" else 1, disabled=not e7_bool)
-    with vc2:
-        v_speed = st.selectbox("VITESSE", ["Ultra-slow", "Slow motion", "Real-time"], disabled=not e7_bool)
-    
-    prompt_3 = f"Video Animation: Melo {am_val}. Pipo {ap_val}. Mode: {v_mode}. Speed: {v_speed}."
-    st.info("📝 PROMPT VIDÉO :")
-    st.code(prompt_3)
+    v_mode = st.selectbox("MODE VIDÉO", ["Perfect loop", "Cinematic non-loop"], disabled=not e7_bool)
+    st.code(f"Animation: Melo {s_pose_m} in {e5_en}. Mode: {v_mode}.")
 
 # =========================================================
-# 5. MOTEUR DE RENDU (VERTEX AI)
+# 7. MOTEUR RENDU
 # =========================================================
-def render_melo(prompt):
-    try:
-        creds = service_account.Credentials.from_service_account_info(st.secrets["gcp_service_account"])
-        aiplatform.init(project="melo-prompt-generator", location="us-central1", credentials=creds)
-        model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
-        with st.spinner("Calcul Nanobanana Pro..."):
-            imgs = model.generate_images(prompt=prompt, number_of_images=1, aspect_ratio="16:9")
-            st.image(imgs[0]._pil_image, use_column_width=True)
-    except Exception as e:
-        st.error(f"Erreur Vertex : {e}")
-
-st.divider()
 if st.button("🚀 RENDU UNIQUE (ONGLET ACTIF)"):
-    # Envoyer le prompt correspondant à l'onglet sélectionné
-    render_melo(prompt_1)
+    st.success("Appel Vertex AI...")
