@@ -3,128 +3,126 @@ import pandas as pd
 import io
 
 # =========================================================
-# ZONE 1 : CONFIGURATION GLOBALE & IDENTITÉ (LOCK)
+# 1. CONFIGURATION & SESSION STATE
 # =========================================================
-B22_IDENTITY_LOCK = """MÉLO (LOCK): Bunny-shaped high-end designer toy, blue glossy glass suit...
-PIPO (LOCK): Microscopic snow-potato companion, iridescent reflections..."""
-
-# =========================================================
-# ZONE 2 : MOTEUR DE DONNÉES & SESSION STATE
-# =========================================================
-def init_data():
-    """Initialise les structures de données dans la mémoire Streamlit."""
-    if 'melo_data' not in st.session_state:
-        st.session_state.melo_data = None
-
-def load_excel(file):
-    try:
-        df_lieux = pd.read_excel(file, sheet_name="BASE_LIEUX")
-        df_plans = pd.read_excel(file, sheet_name="PLANS")
-        df_lists = pd.read_excel(file, sheet_name="Lists")
-
-        # Reconstruction DB_DECORS (Lieux)
-        db_decors = {}
-        for _, row in df_lieux.iterrows():
-            vid = str(row['ID_CITY']).strip()
-            db_decors[vid] = {
-                "nom_fr": row['CITY_NAME_FR'],
-                "decors": {
-                    i: {"fr": row[f'B5_{i}_NAME_FR'], "en": row[f'B5_{i}_NAME_EN'], "cue": row[f'B12_{i}_CUE']}
-                    for i in range(1, 5)
-                }
-            }
-
-        # Reconstruction PLANS_SEQ (Scénario)
-        plans_seq = df_plans.set_index('PLAN_ID').to_dict(orient='index')
-
-        # Reconstruction MAT_MAP (Matières)
-        mat_map = df_lists.groupby('CATEGORY')['MATERIAL_NAME'].apply(list).to_dict()
-
-        st.session_state.melo_data = {
-            "decors": db_decors,
-            "plans": plans_seq,
-            "matieres": mat_map
-        }
-        st.success("✅ Fichier chargé et synchronisé !")
-    except Exception as e:
-        st.error(f"Erreur de lecture : {e}. Vérifiez les noms d'onglets et de colonnes.")
-
-# --- SIDEBAR : CONTRÔLE ET EXPORT ---
 st.set_page_config(page_title="Melo Production V71", layout="wide")
-init_data()
 
+def init_app_state():
+    if 'melo_db' not in st.session_state:
+        st.session_state.melo_db = None
+
+# =========================================================
+# 2. CHARGEMENT DYNAMIQUE DEPUIS EXCEL
+# =========================================================
 with st.sidebar:
     st.title("🎬 STUDIO MÉLO")
-    uploaded_file = st.file_uploader("Charger Excel Maître", type="xlsx")
-    if uploaded_file and st.session_state.melo_data is None:
-        load_excel(uploaded_file)
+    uploaded_file = st.file_uploader("Charger 'MELO VALIDE' (XLSX)", type="xlsx")
     
-    if st.session_state.melo_data:
-        st.divider()
-        e7_bool = st.toggle("🕹️ MODE ÉDITION MANUELLE", value=False)
-        v_id = st.selectbox("DESTINATION", list(st.session_state.melo_data["decors"].keys()), 
-                            format_func=lambda x: st.session_state.melo_data["decors"][x]['nom_fr'])
-        p_id = st.select_slider("NUMÉRO DU PLAN", options=list(st.session_state.melo_data["plans"].keys()))
-        
-        # Bouton d'exportation pour sauvegarder vos modifs
-        st.subheader("💾 SAUVEGARDE")
-        df_exp = pd.DataFrame.from_dict(st.session_state.melo_data['plans'], orient='index')
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df_exp.to_excel(writer, sheet_name='PLANS')
-        st.download_button("Exporter Scénario Modifié", output.getvalue(), "melo_custom.xlsx")
+    if uploaded_file and st.session_state.melo_db is None:
+        try:
+            # Lecture des feuilles clés
+            df_lieux = pd.read_excel(uploaded_file, sheet_name="BASE_LIEUX")
+            df_plans = pd.read_excel(uploaded_file, sheet_name="PLAN_DE_REALISATION")
+            df_lists = pd.read_excel(uploaded_file, sheet_name="Lists")
 
-if not st.session_state.melo_data:
-    st.info("👋 Bienvenue. Veuillez charger le fichier Excel pour activer l'interface.")
+            # Stockage des listes pour les menus déroulants
+            st.session_state.lists = {col: df_lists[col].dropna().unique().tolist() for col in df_lists.columns}
+            
+            # Stockage du scénario (20 plans)
+            st.session_state.scenarios = df_plans.set_index('Plan_ID').to_dict(orient='index')
+            
+            # Stockage des lieux
+            st.session_state.lieux = df_lieux.set_index('LieuKey').to_dict(orient='index')
+            
+            st.session_state.melo_db = True
+            st.success("✅ Studio prêt !")
+        except Exception as e:
+            st.error(f"Erreur : {e}")
+
+if not st.session_state.get('melo_db'):
+    st.info("👋 Veuillez charger votre fichier Excel pour activer les commandes.")
     st.stop()
 
-# --- LOGIQUE DE SYNCHRO ---
-DATA = st.session_state.melo_data
-ville = DATA["decors"][v_id]
-plan = DATA["plans"][p_id]
-auto_b5_id = ((p_id - 1) % 4) + 1
+# --- RÉCUPÉRATION DES DONNÉES EN MÉMOIRE ---
+L = st.session_state.lists
+SCENARIO = st.session_state.scenarios
+LIEUX = st.session_state.lieux
+
+# --- PILOTAGE BARRE LATÉRALE ---
+with st.sidebar:
+    st.divider()
+    e7_bool = st.toggle("🕹️ ACTIVER MODE MANUEL (E7)", value=False)
+    v_id = st.selectbox("DÉCOR (E5)", list(LIEUX.keys()), format_func=lambda x: f"{x} - {LIEUX[x].get('Lieu_FR', '')}")
+    p_id = st.select_slider("NUMÉRO DU PLAN", options=list(SCENARIO.keys()))
+    
+    # Sélection du Scénario (A, B ou C)
+    sc_ver = st.radio("VARIANTE DE SCÉNARIO", ["A", "B", "C"])
+    
+    st.divider()
+    # Bouton d'exportation
+    df_exp = pd.DataFrame.from_dict(SCENARIO, orient='index')
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df_exp.to_excel(writer, sheet_name='PLANS_MODIFIES')
+    st.download_button("💾 Exporter Scénario", output.getvalue(), "scenario_final.xlsx")
+
+# Plan et Lieu actuels
+plan = SCENARIO[p_id]
+lieu = LIEUX[v_id]
 
 # =========================================================
-# ZONE 3 : INTERFACE (ONGLETS)
+# 3. INTERFACE PAR ONGLETS
 # =========================================================
-tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR", "🎨 2. IMAGE (ÉDITEUR)", "🎞️ 3. VIDÉO"])
+tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (ENV)", "🎨 2. IMAGE (PERSOS)", "🎞️ 3. VIDÉO"])
 
+# --- ONGLET 1 : DÉCOR ---
 with tab1:
-    st.subheader("⚙️ Paramètres du Décor")
+    st.subheader("⚙️ Paramètres de l'Environnement")
     c1, c2, c3 = st.columns(3)
     with c1:
-        b5_val = st.selectbox("DÉCOR (E5)", [1,2,3,4], index=auto_b5_id-1, format_func=lambda x: ville['decors'][x]['fr'], disabled=not e7_bool)
-        b6_val = st.selectbox("ANGLE", ["Establishing wide shot", "Medium shot", "Close-up"], index=0, disabled=not e7_bool)
+        b6_val = st.selectbox("ANGLE (B6/I34)", L['Angles_EN'], disabled=not e7_bool)
+        b9_val = st.selectbox("SAISON (B9)", L['Season_EN'], disabled=not e7_bool)
     with c2:
-        b7_val = st.selectbox("TIME", ["morning", "sunset", "night"], index=0, disabled=not e7_bool)
-        b8_val = st.selectbox("WEATHER", ["heavy rain", "clear sky", "soft mist"], index=0, disabled=not e7_bool)
+        b7_val = st.selectbox("TIME OF DAY (B7/I35)", L['Time_of_day_EN'], disabled=not e7_bool)
+        b8_val = st.selectbox("WEATHER (B8)", L['Weather_EN'], disabled=not e7_bool)
     with c3:
-        # Utilisation des matières chargées dynamiquement
-        all_mats = [m for sub in DATA["matieres"].values() for m in sub]
-        d8_val = st.selectbox("MATÉRIEL D8", all_mats, disabled=not e7_bool)
+        d8_val = st.selectbox("MATÉRIEL D8", L['MATERIAL_MAIN_EN'], disabled=not e7_bool)
+        d9_val = st.selectbox("MATÉRIEL D9", L['MATERIAL_ACCENT_EN'], disabled=not e7_bool)
+    
+    b10_val = st.selectbox("ÉTAT DU SOL (B10)", L['Ground_state_EN'], disabled=not e7_bool)
+    
+    st.code(f"PROMPT DÉCOR: {lieu.get('Decor_Prompt_Simplified_EN', '')} in {b9_val}, {b7_val} light. Texture: {d8_val}.")
 
-    # Prompt 1 (Calculé en temps réel)
-    prompt_1 = f"Environment: {ville['decors'][b5_val]['en']}. Lighting: {b7_val}. Shading: {d8_val}."
-    st.code(prompt_1)
-
+# --- ONGLET 2 : IMAGE (ÉDITEUR) ---
 with tab2:
-    st.subheader("🎨 Pose & Expression (Modifiable en direct)")
+    st.subheader("🎨 Mise en scène & Personnages")
     r1, r2 = st.columns(2)
+    
+    # Récupération dynamique des colonnes selon la version (A, B ou C)
+    col_melo = f"{sc_ver}_Melo_Action_EN"
+    col_pipo = f"{sc_ver}_Pipo_Action_EN"
+
     with r1:
-        # MODIFICATION DIRECTE DU SESSION STATE
-        plan['M_Pose'] = st.text_area("Pose Mélo", value=plan.get('M_Pose', ""))
-        plan['M_Expr'] = st.text_area("Expression Mélo", value=plan.get('M_Expr', ""))
+        plan[col_melo] = st.text_area("Pose Mélo (Modifiable)", value=plan.get(col_melo, ""))
+        s_pal = st.selectbox("Color Palette", L['Color_Palette_EN'])
     with r2:
-        plan['P_Act'] = st.text_area("Action Pipo", value=plan.get('P_Act', ""))
-        plan['P_Pos'] = st.text_input("Position Pipo", value=plan.get('P_Pos', ""))
+        plan[col_pipo] = st.text_area("Pose Pipo (Modifiable)", value=plan.get(col_pipo, ""))
+        s_pcol = st.selectbox("Pipo Color", L['Pipo_Color_EN'])
+        s_trail = st.selectbox("Pipo Energy Trail", L['Pipo_Energy_Trail_EN'])
 
-    prompt_2 = f"IDENTITY LOCK: {B22_IDENTITY_LOCK}\nDIRECTION: {plan['M_Pose']}, {plan['M_Expr']}. PIPO: {plan['P_Act']}."
-    st.code(prompt_2)
+    st.code(f"PROMPT IMAGE: Mélo: {plan[col_melo]} | Pipo: {plan[col_pipo]} | Palette: {s_pal}")
 
+# --- ONGLET 3 : VIDÉO ---
 with tab3:
-    st.subheader("🎞️ Paramètres Vidéo")
-    st.write(f"Mode actuel pour le plan {p_id} : {plan.get('V_Mode', 'N/A')}")
-    st.code(f"VIDEO PROMPT: Action {plan.get('V_Act', 'None')}, Cam: {plan.get('V_Cam', 'Locked')}")
+    st.subheader("🎞️ Paramètres d'Animation")
+    v1, v2 = st.columns(2)
+    with v1:
+        v_mode = st.selectbox("Mode vidéo", L['VIDEO_Mode_EN'])
+        v_act = st.selectbox("Type d’action", L['VIDEO_ActionType_EN'])
+        v_m_mvt = st.selectbox("Mouvement de Mélo", L['VIDEO_MeloMotion_EN'])
+    with v2:
+        v_p_mvt = st.selectbox("Mouvement de Pipo", L['VIDEO_PipoMotion_EN'])
+        v_cam = st.selectbox("Mouvement caméra", L['VIDEO_Camera_EN'])
+        v_env = st.selectbox("Mouvement environnement", L['VIDEO_Env_EN'])
 
-if st.button("🚀 RENDU VERTEX ULTRA"):
-    st.info("Génération en cours avec les données éditées...")
+    st.code(f"PROMPT VIDÉO: {v_mode}, {v_act}. Motion: Mélo {v_m_mvt}, Pipo {v_p_mvt}. Cam: {v_cam}")
