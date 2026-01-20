@@ -6,115 +6,123 @@ DNA_PIPO = "Microscopic snow-potato companion; white with subtle iridescent mult
 MATERIAL_MAIN_DNA = "Homogeneous transparent blue glass/jelly, no internal anatomy, high light refraction (IOR 1.5), realistic caustics."
 TECH_LOCKS = "Ultra-realistic cinematic PBR, natural optics, ray-traced reflections, 8k, macro-cinematography, ground level camera."
 
-# --- 2. MATÉRIAUX (D8 / D9) ---
-MAT_LIST = ["Translucent jelly candy (glossy)", "Marshmallow foam (matte soft)", "Fondant sugar paste (matte)", "Honey wax (warm glow)", "Chocolate tri-blend", "Felted wool fabric", "Cotton quilted padding", "Light birch wood", "Toy wood", "lego"]
+# --- 2. BIBLIOTHÈQUE DE MATÉRIAUX (D8 / D9) ---
+MAT_LIST = [
+    "Translucent jelly candy (glossy)", "Translucent colored jelly candy (glossy)", "Hard candy (polished smooth)", 
+    "Marshmallow foam (matte soft)", "Fondant sugar paste (matte)", "Honey wax (warm glow)", 
+    "Chocolate tri-blend", "White chocolate velvet", "Felted wool fabric", "Cotton quilted padding", 
+    "Velvet microfabric", "Cotton fiber cloud", "Memory foam sponge", "Soft porous sponge", 
+    "Handmade paper (soft grain)", "Paper mâché (smooth)", "Origami layered paper", 
+    "Light birch wood", "Toy wood", "Milk-painted wood (pastel)", "Soft clay (matte)", 
+    "Porcelain clay (silky matte)", "lego"
+]
 
-# --- 3. BASE DE DONNÉES COMPLÈTE : 20 DESTINATIONS (COLONNE A, E, F) ---
+# --- 3. BASE DE DONNÉES COMPLÈTE (20 DESTINATIONS / 80 LIEUX) ---
 DESTINATIONS = {
-    "eiffel_paris": {"nom": "Paris", "landmark": "Eiffel Tower", "lieux": {
-        1: {"nom": "Trocadéro", "cue": "Architectural symmetry of the esplanade, stone textures dominant"},
-        2: {"nom": "Quais de Seine", "cue": "Water reflections and cobblestone wetness, low horizon"},
-        3: {"nom": "Pied de la Tour", "cue": "Detailed iron lattice work, upward perspective"},
-        4: {"nom": "Champ-de-Mars", "cue": "Grass textures and soft sunset diffusion"}}},
-    "mont_saint_michel": {"nom": "Mont St-Michel", "landmark": "Abbey silhouette", "lieux": {
-        1: {"nom": "Baie sableuse", "cue": "Focus on wet sand ripples and shallow water reflections"},
-        2: {"nom": "Remparts", "cue": "Ancient stone textures, sea breeze atmosphere"},
-        3: {"nom": "Abbaye", "cue": "Gothic architectural details, soft stone glow"},
-        4: {"nom": "Ruelle médiévale", "cue": "Medieval timber-frame textures, warm lantern light"}}},
-    "santorini": {"nom": "Santorin", "landmark": "Blue Dome Church", "lieux": {
-        1: {"nom": "Murs blancs", "cue": "High-key lighting, smooth white plaster"},
-        2: {"nom": "Escaliers", "cue": "Deep blue water bokeh, geometric white steps"},
-        3: {"nom": "Terrasse", "cue": "Aegean sea horizon, soft sunset glow"},
-        4: {"nom": "Dôme bleu", "cue": "Cobalt blue surface contrast with white walls"}}},
-    "venice": {"nom": "Venise", "landmark": "St Mark's Basilica", "lieux": {
-        1: {"nom": "Grand Canal", "cue": "Water ripples, gondola silhouettes, ancient facades"},
-        2: {"nom": "Pont des Soupirs", "cue": "Narrow canal perspective, stone bridge textures"},
-        3: {"nom": "Place St-Marc", "cue": "Intricate paving patterns, Byzantine details"},
-        4: {"nom": "Gondole", "cue": "Internal wooden boat textures, water level view"}}},
-    "taj_mahal": {"nom": "Taj Mahal", "landmark": "Taj Mahal dome", "lieux": {
-        1: {"nom": "Bassin miroir", "cue": "Perfect symmetry, white marble reflections"},
-        2: {"nom": "Porte principale", "cue": "Red sandstone framing the white monument"},
-        3: {"nom": "Jardin", "cue": "Cypress trees, symmetrical paths, soft morning mist"},
-        4: {"nom": "Bord Yamuna", "cue": "Distant silhouette across the river, glowing mist"}}},
-    "giza": {"nom": "Gizeh", "landmark": "Great Pyramid", "lieux": {
-        1: {"nom": "Dunes", "cue": "Fine sand ripples, vast desert horizon"},
-        2: {"nom": "Pied Pyramide", "cue": "Macro stone block textures, immense scale"},
-        3: {"nom": "Sphinx", "cue": "Ancient weathered limestone textures, profile view"},
-        4: {"nom": "Désert nuit", "cue": "Starry sky, silhouette of pyramids, deep shadows"}}},
-    "petra": {"nom": "Petra", "landmark": "Al-Khazneh (The Treasury)", "lieux": {
-        1: {"nom": "Le Siq", "cue": "Narrow canyon walls, high verticality, sandstone textures"},
-        2: {"nom": "Le Trésor", "cue": "Intricate rock-cut architecture, rosy sandstone glow"},
-        3: {"nom": "Haut-Lieu", "cue": "Panoramic desert view, sacrificial stone textures"},
-        4: {"nom": "Grottes", "cue": "Internal cave textures, play of light and shadow"}}},
-    "lapland": {"nom": "Laponie", "landmark": "Arctic Cabin", "lieux": {
-        1: {"nom": "Forêt neige", "cue": "Crystalline snow on pine branches, soft bokeh"},
-        2: {"nom": "Igloo", "cue": "Translucent ice blocks, internal warm glow"},
-        3: {"nom": "Traîneau", "cue": "Wooden textures, fur rugs, snowy path"},
-        4: {"nom": "Ciel Aurores", "cue": "Green glowing light trails, snowy silhouettes"}}},
-    "fuji": {"nom": "Mont Fuji", "landmark": "Fuji-san Peak", "lieux": {
-        1: {"nom": "Lac Kawaguchi", "cue": "Still water reflection, cherry blossoms"},
-        2: {"nom": "Pagode", "cue": "Red lacquered wood, distant snowy peak"},
-        3: {"nom": "Forêt pins", "cue": "Soft moss, sunlight filtering through needles"},
-        4: {"nom": "Village", "cue": "Traditional thatched roofs, morning mist"}}},
-    "ny_times_square": {"nom": "New York", "landmark": "Times Square billboards", "lieux": {
-        1: {"nom": "Times Square", "cue": "Neon light reflections, asphalt textures, urban density"},
-        2: {"nom": "Central Park", "cue": "Contrast of nature and skyscrapers, soft pond reflections"},
-        3: {"nom": "Brooklyn Bridge", "cue": "Steel cable textures, wooden planks, city silhouette"},
-        4: {"nom": "Subway", "cue": "Tiled walls, metallic train surfaces, cinematic depth"}}},
-    "great_wall": {"nom": "Grande Muraille", "landmark": "Watchtower", "lieux": {
-        1: {"nom": "Tour de guet", "cue": "Ancient brick textures, window framing the landscape"},
-        2: {"nom": "Crête", "cue": "Infinite path receding into the mist, stone textures"},
-        3: {"nom": "Escaliers", "cue": "Steep perspective, weathered stone steps"},
-        4: {"nom": "Brouillard", "cue": "Atmospheric depth, silhouette of mountains"}}},
-    "machu_picchu": {"nom": "Machu Picchu", "landmark": "Inca Ruins", "lieux": {
-        1: {"nom": "Terrasses", "cue": "Green grass layers, precise stone masonry"},
-        2: {"nom": "Sommet", "cue": "Looking down on ruins, dramatic cloud bokeh"},
-        3: {"nom": "Temple", "cue": "Massive granite blocks, geometric shadows"},
-        4: {"nom": "Porte Soleil", "cue": "Distant view through an archway, morning glow"}}},
-    "bali_ubud": {"nom": "Bali", "landmark": "Rice Terrace", "lieux": {
-        1: {"nom": "Tegalalang", "cue": "Lush green layers, tropical palm silhouettes"},
-        2: {"nom": "Temple Eau", "cue": "Mossy stone carvings, clear water reflections"},
-        3: {"nom": "Forêt Singes", "cue": "Banyan tree roots, filtered sunlight, stone idols"},
-        4: {"nom": "Cascade", "cue": "Volumetric water spray, wet rock textures"}}},
-    "safari_kenya": {"nom": "Masai Mara", "landmark": "Acacia Tree", "lieux": {
-        1: {"nom": "Savane", "cue": "Golden dry grass textures, flat horizon"},
-        2: {"nom": "Acacia", "cue": "Silhouetted tree against sunset, vast negative space"},
-        3: {"nom": "Rivière", "cue": "Muddy water textures, hippo silhouettes"},
-        4: {"nom": "Campement", "cue": "Canvas textures, wooden poles, evening fire glow"}}},
-    "london_big_ben": {"nom": "Londres", "landmark": "Big Ben Clock", "lieux": {
-        1: {"nom": "Big Ben", "cue": "Gothic stone carvings, gold clock face details"},
-        2: {"nom": "Cabine Rouge", "cue": "Reflective red paint, glass textures, rain bokeh"},
-        3: {"nom": "Tower Bridge", "cue": "Blue steel structure, stone pillars, river mist"},
-        4: {"nom": "Parc Royal", "cue": "Manicured grass, distant city silhouette"}}},
-    "rio_christ": {"nom": "Rio", "landmark": "Christ the Redeemer", "lieux": {
-        1: {"nom": "Corcovado", "cue": "Soapstone texture of the statue, clouds below"},
-        2: {"nom": "Copacabana", "cue": "Patterned pavement, white sand, ocean bokeh"},
-        3: {"nom": "Pain de Sucre", "cue": "Granite rock textures, bay view from above"},
-        4: {"nom": "Escaliers", "cue": "Colorful mosaic tile textures, urban depth"}}},
-    "kyoto_fushimi": {"nom": "Kyoto", "landmark": "Fushimi Inari Torii", "lieux": {
-        1: {"nom": "Torii Path", "cue": "Infinite red lacquered gates, rhythmic perspective"},
-        2: {"nom": "Bambouseraie", "cue": "Vertical green stalk textures, filtered light"},
-        3: {"nom": "Temple d'Or", "cue": "Gold leaf reflections on water, pine tree bokeh"},
-        4: {"nom": "Ruelle Gion", "cue": "Wooden machiya facades, paper lanterns"}}},
-    "sydney_opera": {"nom": "Sydney", "landmark": "Opera House Sails", "lieux": {
-        1: {"nom": "Opéra", "cue": "Ceramic tile textures of the sails, harbor water"},
-        2: {"nom": "Bridge", "cue": "Massive steel bolt textures, bridge perspective"},
-        3: {"nom": "Bondi", "cue": "Ocean spray, white sand, turquoise water depth"},
-        4: {"nom": "Ferry", "cue": "Metallic deck textures, city view from the water"}}},
-    "moscow_red_square": {"nom": "Moscou", "landmark": "St. Basil's Cathedral", "lieux": {
-        1: {"nom": "Place Rouge", "cue": "Cobblestone expanse, red brick Kremlin walls"},
-        2: {"nom": "St Basile", "cue": "Intricate colorful dome patterns, stone textures"},
-        3: {"nom": "Métro", "cue": "Ornate marble pillars, bronze statues, glowing light"},
-        4: {"nom": "Bord de l'eau", "cue": "River reflections of the city lights, winter mist"}}},
-    "antelope_canyon": {"nom": "Antelope Canyon", "landmark": "Sandstone Slot Canyon", "lieux": {
-        1: {"nom": "Slot Canyon", "cue": "Flowing rock wave textures, orange/purple glow"},
-        2: {"nom": "Light Beam", "cue": "Volumetric sunbeam hitting the canyon floor"},
-        3: {"nom": "Vagues", "cue": "Macro focus on layered sandstone sediment"},
-        4: {"nom": "Entrée", "cue": "Narrow desert entrance, sharp contrast of light"}}}
+    "paris": {"nom": "La Tour Eiffel (Paris, France)", "landmark": "Eiffel Tower", "lieux": {
+        1: {"nom": "Le Trocadéro", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Le Trocadéro. Keep framing stable, no characters, no animals, no text."},
+        2: {"nom": "Les Quais de Seine", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Les Quais de Seine. Keep framing stable, no characters, no animals, no text."},
+        3: {"nom": "Au pied de la Tour", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Au pied de la Tour. Keep framing stable, no characters, no animals, no text."},
+        4: {"nom": "Pelouse du Champ-de-Mars", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Pelouse du Champ-de-Mars. Keep framing stable, no characters, no animals, no text."}}},
+    "mont_st_michel": {"nom": "Le Mont Saint-Michel (France)", "landmark": "Mont-Saint-Michel", "lieux": {
+        1: {"nom": "La Baie", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mont-Saint-Michel silhouette recognizable, tidal bay, ancient stone textures, soft mist. Specific setting: La Baie. Keep framing stable, no characters, no animals, no text."},
+        2: {"nom": "La Porte d'Entrée", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mont-Saint-Michel silhouette recognizable, tidal bay, ancient stone textures, soft mist. Specific setting: La Porte d'Entrée. Keep framing stable, no characters, no animals, no text."},
+        3: {"nom": "Le Cloître", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mont-Saint-Michel silhouette recognizable, tidal bay, ancient stone textures, soft mist. Specific setting: Le Cloître. Keep framing stable, no characters, no animals, no text."},
+        4: {"nom": "Les Dunes", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mont-Saint-Michel silhouette recognizable, tidal bay, ancient stone textures, soft mist. Specific setting: Les Dunes. Keep framing stable, no characters, no animals, no text."}}},
+    "santorini": {"nom": "Santorin (Grèce)", "landmark": "Santorini architecture", "lieux": {
+        1: {"nom": "La Vue Haute", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Santorini whitewashed architecture, blue domes, Aegean sea horizon, pastel sunset. Specific setting: La Vue Haute. Keep framing stable, no characters, no animals, no text."},
+        2: {"nom": "La Ruelle Blanche", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Santorini whitewashed architecture, blue domes, Aegean sea horizon, pastel sunset. Specific setting: La Ruelle Blanche. Keep framing stable, no characters, no animals, no text."},
+        3: {"nom": "La Terrasse", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Santorini whitewashed architecture, blue domes, Aegean sea horizon, pastel sunset. Specific setting: La Terrasse. Keep framing stable, no characters, no animals, no text."},
+        4: {"nom": "Le Muret", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Santorini whitewashed architecture, blue domes, Aegean sea horizon, pastel sunset. Specific setting: Le Muret. Keep framing stable, no characters, no animals, no text."}}},
+    "venice": {"nom": "Venise (Italie)", "landmark": "Venice canals", "lieux": {
+        1: {"nom": "Le Grand Canal", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Venice canals, calm water reflections, historic facades, soft lantern bokeh. Specific setting: Le Grand Canal. Keep framing stable, no characters, no animals, no text."},
+        2: {"nom": "La Petite Ruelle", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Venice canals, calm water reflections, historic facades, soft lantern bokeh. Specific setting: La Petite Ruelle. Keep framing stable, no characters, no animals, no text."},
+        3: {"nom": "La Place Saint-Marc", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Venice canals, calm water reflections, historic facades, soft lantern bokeh. Specific setting: La Place Saint-Marc. Keep framing stable, no characters, no animals, no text."},
+        4: {"nom": "L'Intérieur de la Gondole", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Venice canals, calm water reflections, historic facades, soft lantern bokeh. Specific setting: L'Intérieur de la Gondole. Keep framing stable, no characters, no animals, no text."}}},
+    "neuschwanstein": {"nom": "Château de Neuschwanstein (Allemagne)", "landmark": "Fairytale castle", "lieux": {
+        1: {"nom": "Le Pont Marie", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Fairytale castle silhouette, Bavarian alpine forest, soft snow or mist, calm. Specific setting: Le Pont Marie."},
+        2: {"nom": "Le Chemin de Forêt", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Fairytale castle silhouette, Bavarian alpine forest, soft snow or mist, calm. Specific setting: Le Chemin de Forêt."},
+        3: {"nom": "La Cour du Château", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Fairytale castle silhouette, Bavarian alpine forest, soft snow or mist, calm. Specific setting: La Cour du Château."},
+        4: {"nom": "Le Balcon", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Fairytale castle silhouette, Bavarian alpine forest, soft snow or mist, calm. Specific setting: Le Balcon."}}},
+    "london": {"nom": "Big Ben (Londres, UK)", "landmark": "Big Ben", "lieux": {
+        1: {"nom": "Le Pont de Westminster", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Big Ben clock tower silhouette, London classic stone. Specific setting: Le Pont de Westminster."},
+        2: {"nom": "La Cabine Téléphonique", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Big Ben clock tower silhouette, London classic stone. Specific setting: La Cabine Téléphonique."},
+        3: {"nom": "Le Quai de la Tamise", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Big Ben clock tower silhouette, London classic stone. Specific setting: Le Quai de la Tamise."},
+        4: {"nom": "Le Banc du Parc", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Big Ben clock tower silhouette, London classic stone. Specific setting: Le Banc du Parc."}}},
+    "kinderdijk": {"nom": "Moulins de Kinderdijk (Pays-Bas)", "landmark": "Dutch windmills", "lieux": {
+        1: {"nom": "Le Sentier du Canal", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Dutch windmills, flat canals, slow reflections. Specific setting: Le Sentier du Canal."},
+        2: {"nom": "Le Pont de Bois", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Dutch windmills, flat canals, slow reflections. Specific setting: Le Pont de Bois."},
+        3: {"nom": "Le Pied du Moulin", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Dutch windmills, flat canals, slow reflections. Specific setting: Le Pied du Moulin."},
+        4: {"nom": "Le Pont de la Barque", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Dutch windmills, flat canals, slow reflections. Specific setting: Le Pont de la Barque."}}},
+    "fuji": {"nom": "Le Mont Fuji (Japon)", "landmark": "Mount Fuji", "lieux": {
+        1: {"nom": "Le Lac Kawaguchi", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mount Fuji recognizable, quiet lake reflections. Specific setting: Le Lac Kawaguchi."},
+        2: {"nom": "Le Portail Torii", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mount Fuji recognizable, quiet lake reflections. Specific setting: Le Portail Torii."},
+        3: {"nom": "Le Jardin de Cerisiers", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mount Fuji recognizable, quiet lake reflections. Specific setting: Le Jardin de Cerisiers."},
+        4: {"nom": "Le Tapis de Mousse", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Mount Fuji recognizable, quiet lake reflections. Specific setting: Le Tapis de Mousse."}}},
+    "taj_mahal": {"nom": "Le Taj Mahal (Inde)", "landmark": "Taj Mahal", "lieux": {
+        1: {"nom": "L'Allée Centrale", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Taj Mahal symmetrical white marble, long reflecting pool. Specific setting: L'Allée Centrale."},
+        2: {"nom": "Le Jardin de Fleurs", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Taj Mahal symmetrical white marble, long reflecting pool. Specific setting: Le Jardin de Fleurs."},
+        3: {"nom": "La Terrasse de Marbre", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Taj Mahal symmetrical white marble, long reflecting pool. Specific setting: La Terrasse de Marbre."},
+        4: {"nom": "Le Banc de Pierre", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Taj Mahal symmetrical white marble, long reflecting pool. Specific setting: Le Banc de Pierre."}}},
+    "china_wall": {"nom": "La Grande Muraille (Chine)", "landmark": "Great Wall", "lieux": {
+        1: {"nom": "La Crête de Montagne", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Great Wall serpentine line across mountains. Specific setting: La Crête de Montagne."},
+        2: {"nom": "L'Intérieur de la Tour", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Great Wall serpentine line across mountains. Specific setting: L'Intérieur de la Tour."},
+        3: {"nom": "L'Escalier de Pierre", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Great Wall serpentine line across mountains. Specific setting: L'Escalier de Pierre."},
+        4: {"nom": "La Tour de Guet", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Great Wall serpentine line across mountains. Specific setting: La Tour de Guet."}}},
+    "ha_long": {"nom": "La Baie d'Ha Long (Vietnam)", "landmark": "Ha Long Bay", "lieux": {
+        1: {"nom": "La Mer", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Ha Long Bay karst islands, calm emerald water. Specific setting: La Mer."},
+        2: {"nom": "Le Village Flottant", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Ha Long Bay karst islands, calm emerald water. Specific setting: Le Village Flottant."},
+        3: {"nom": "La Grotte", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Ha Long Bay karst islands, calm emerald water. Specific setting: La Grotte."},
+        4: {"nom": "Le Pont de la Jonque", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Ha Long Bay karst islands, calm emerald water. Specific setting: Le Pont de la Jonque."}}},
+    "liberty": {"nom": "La Statue de la Liberté (New York, USA)", "landmark": "Statue of Liberty", "lieux": {
+        1: {"nom": "Le Ferry", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Statue of Liberty silhouette, calm harbor water. Specific setting: Le Ferry."},
+        2: {"nom": "Le Socle de la Statue", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Statue of Liberty silhouette, calm harbor water. Specific setting: Le Socle de la Statue."},
+        3: {"nom": "La Promenade de l'Île", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Statue of Liberty silhouette, calm harbor water. Specific setting: La Promenade de l'Île."},
+        4: {"nom": "Le Banc de Liberty Island", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Statue of Liberty silhouette, calm harbor water. Specific setting: Le Banc de Liberty Island."}}},
+    "machu_picchu": {"nom": "Machu Picchu (Pérou)", "landmark": "Machu Picchu", "lieux": {
+        1: {"nom": "La Vue Haute", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Machu Picchu ruins, high clouds and mist. Specific setting: La Vue Haute."},
+        2: {"nom": "Les Terrasses Agricoles", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Machu Picchu ruins, high clouds and mist. Specific setting: Les Terrasses Agricoles."},
+        3: {"nom": "Le Temple du Soleil", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Machu Picchu ruins, high clouds and mist. Specific setting: Le Temple du Soleil."},
+        4: {"nom": "Le Champ de Sommet", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Machu Picchu ruins, high clouds and mist. Specific setting: Le Champ de Sommet."}}},
+    "golden_gate": {"nom": "Golden Gate Bridge (San Francisco, USA)", "landmark": "Golden Gate Bridge", "lieux": {
+        1: {"nom": "Vista Point", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Golden Gate Bridge iconic orange-red. Specific setting: Vista Point."},
+        2: {"nom": "Le Pont (Trottoir)", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Golden Gate Bridge iconic orange-red. Specific setting: Le Pont (Trottoir)."},
+        3: {"nom": "Baker Beach", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Golden Gate Bridge iconic orange-red. Specific setting: Baker Beach."},
+        4: {"nom": "La Pelouse de Presidio", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Golden Gate Bridge iconic orange-red. Specific setting: La Pelouse de Presidio."}}},
+    "rio": {"nom": "Christ Rédempteur (Rio, Brésil)", "landmark": "Christ the Redeemer", "lieux": {
+        1: {"nom": "Le Belvédère", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Christ the Redeemer silhouette, bay far below. Specific setting: Le Belvédère."},
+        2: {"nom": "Le Train de Corcovado", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Christ the Redeemer silhouette, bay far below. Specific setting: Le Train de Corcovado."},
+        3: {"nom": "Le Pied de la Statue", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Christ the Redeemer silhouette, bay far below. Specific setting: Le Pied de la Statue."},
+        4: {"nom": "Le Jardin Botanique", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Christ the Redeemer silhouette, bay far below. Specific setting: Le Jardin Botanique."}}},
+    "giza": {"nom": "Les Pyramides de Gizeh (Égypte)", "landmark": "Giza Pyramids", "lieux": {
+        1: {"nom": "Le Panorama des Dunes", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Giza pyramids geometric silhouettes, smooth sand. Specific setting: Le Panorama des Dunes."},
+        2: {"nom": "Le Pied de Khéops", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Giza pyramids geometric silhouettes, smooth sand. Specific setting: Le Pied de Khéops."},
+        3: {"nom": "Le Sphinx", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Giza pyramids geometric silhouettes, smooth sand. Specific setting: Le Sphinx."},
+        4: {"nom": "La Tente Bédouine", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Giza pyramids geometric silhouettes, smooth sand. Specific setting: La Tente Bédouine."}}},
+    "petra": {"nom": "Pétra (Jordanie)", "landmark": "Petra", "lieux": {
+        1: {"nom": "Le Siq", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Petra rose sandstone, carved facades. Specific setting: Le Siq."},
+        2: {"nom": "Le Trésor", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Petra rose sandstone, carved facades. Specific setting: Le Trésor."},
+        3: {"nom": "Le Chemin des Grottes", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Petra rose sandstone, carved facades. Specific setting: Le Chemin des Grottes."},
+        4: {"nom": "Le Tapis de Sable", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Petra rose sandstone, carved facades. Specific setting: Le Tapis de Sable."}}},
+    "serengeti": {"nom": "La Savane du Serengeti (Tanzanie)", "landmark": "Serengeti Savanna", "lieux": {
+        1: {"nom": "La Plaine Infinie", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Serengeti savanna, acacia silhouettes. Specific setting: La Plaine Infinie."},
+        2: {"nom": "Le Point d'Eau", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Serengeti savanna, acacia silhouettes. Specific setting: Le Point d'Eau."},
+        3: {"nom": "Sous l'Acacia", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Serengeti savanna, acacia silhouettes. Specific setting: Sous l'Acacia."},
+        4: {"nom": "Le Campement", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Serengeti savanna, acacia silhouettes. Specific setting: Le Campement."}}},
+    "sydney": {"nom": "L'Opéra de Sydney (Australie)", "landmark": "Sydney Opera House", "lieux": {
+        1: {"nom": "Circular Quay", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Sydney Opera House sail-like shells. Specific setting: Circular Quay."},
+        2: {"nom": "Les Marches de l'Opéra", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Sydney Opera House sail-like shells. Specific setting: Les Marches de l'Opéra."},
+        3: {"nom": "Le Jardin Botanique", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Sydney Opera House sail-like shells. Specific setting: Le Jardin Botanique."},
+        4: {"nom": "Le Banc Face à l'Eau", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Sydney Opera House sail-like shells. Specific setting: Le Banc Face à l'Eau."}}},
+    "lapland": {"nom": "La Laponie (Pôle Nord)", "landmark": "Lapland", "lieux": {
+        1: {"nom": "La Forêt de Sapins", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Lapland snowy landscape, soft aurora glow. Specific setting: La Forêt de Sapins."},
+        2: {"nom": "L'Extérieur de l'Igloo", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Lapland snowy landscape, soft aurora glow. Specific setting: L'Extérieur de l'Igloo."},
+        3: {"nom": "Le Traîneau", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Lapland snowy landscape, soft aurora glow. Specific setting: Le Traîneau."},
+        4: {"nom": "L'Intérieur de l'Igloo", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Lapland snowy landscape, soft aurora glow. Specific setting: L'Intérieur de l'Igloo."}}}
 }
 
 # --- 4. CONFIGURATION UI ---
-st.set_page_config(page_title="Melo Production World Tour", layout="wide")
+st.set_page_config(page_title="Melo Production Hub V28", layout="wide")
 st.markdown("""
     <style>
     .info-card { background-color: #ffffff; border-left: 5px solid #007BFF; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
@@ -124,15 +132,16 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 etape = st.radio("SÉLECTIONNER L'ÉTAPE :", ["🖼️ 1. DÉCOR (FOND)", "🎨 2. IMAGE (PERSONNAGES)", "🎞️ 3. VIDÉO (MOUVEMENT)"], horizontal=True)
+st.divider()
 
 # --- 5. SIDEBAR (LOGIQUE XLSX) ---
 with st.sidebar:
-    st.title("🎬 STUDIO WORLD TOUR")
-    mode_manuel = st.toggle("🕹️ CONTRÔLE MANUEL (E7)", value=False)
+    st.title("🎬 STUDIO GÉNÉRATEUR")
+    mode_manuel = st.toggle("ACTIVER LE CONTRÔLE MANUEL (E7)", value=False)
     e7 = "yes" if mode_manuel else "no"
     
     v_id = st.selectbox("DESTINATION (B9)", list(DESTINATIONS.keys()), format_func=lambda x: DESTINATIONS[x]['nom'])
-    p_id = st.select_slider("PLAN (Scénario)", options=list(range(1, 21)))
+    p_id = st.select_slider("NUMÉRO DU PLAN (Scénario)", options=list(range(1, 21)))
     
     ville = DESTINATIONS[v_id]
     auto_b5 = (p_id - 1) // 5 + 1
@@ -148,12 +157,12 @@ with st.sidebar:
             b5_id = st.selectbox("LIEU PRÉCIS (B5)", [1, 2, 3, 4], index=auto_b5-1, format_func=lambda x: ville['lieux'][x]['nom'])
             b6 = st.selectbox("ANGLE (B6)", ["wide-angle lens", "macro lens", "fisheye"])
             b7 = st.selectbox("LUMIÈRE (B7)", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"])
-            i34 = st.text_input("MANUAL ANGLE (I34)", value="cinematic ground level view")
-            i35 = st.text_input("MANUAL LIGHT (I35)", value="bedtime-friendly soft light")
-            b10 = st.text_input("SOL (B10)", value="soft tactile textures")
-            b11 = st.selectbox("1er PLAN (B11)", ["none", "wild flowers", "puddles", "leaves"])
-            d8 = st.selectbox("MATÉRIAU 1 (D8)", MAT_LIST)
-            d9 = st.selectbox("MATÉRIAU 2 (D9)", ["none"] + MAT_LIST)
+            b10 = st.text_input("TEXTURE SOL (B10)", value="soft tactile textures")
+            b11 = st.selectbox("PREMIER PLAN (B11)", ["none", "wild flowers", "puddles", "leaves"])
+            d8 = st.selectbox("MATÉRIAU PRINCIPAL (D8)", MAT_LIST)
+            d9 = st.selectbox("MATÉRIAU SECONDAIRE (D9)", ["none"] + MAT_LIST)
+            i34 = st.text_input("OVERRIDE ANGLE (I34)", value="cinematic ground level view")
+            i35 = st.text_input("OVERRIDE LUMIÈRE (I35)", value="bedtime-friendly soft light")
         else: b5_id = auto_b5
     else: b5_id = auto_b5
 
@@ -186,7 +195,7 @@ if "DÉCOR" in etape:
     with c1: st.markdown(f'<div class="info-card"><div class="action-title">📍 LIEU PRÉCIS (B5)</div><div class="action-text">{ville["lieux"][b5_id]["nom"]}</div></div>', unsafe_allow_html=True)
     with c2: st.markdown(f'<div class="info-card"><div class="action-title">📸 ANGLE (B6/I34)</div><div class="action-text">{final_angle}</div></div>', unsafe_allow_html=True)
     with c3: st.markdown(f'<div class="info-card"><div class="action-title">🌅 LUMIÈRE (B7/I35)</div><div class="action-text">{final_light}</div></div>', unsafe_allow_html=True)
-    with c4: st.markdown(f'<div class="info-card"><div class="action-title">🍭 MATÉRIEL (D8)</div><div class="action-text">{d8[:15]}...</div></div>', unsafe_allow_html=True)
+    with c4: st.markdown(f'<div class="info-card"><div class="action-title">🍭 MATÉRIAU (D8)</div><div class="action-text">{d8[:15]}...</div></div>', unsafe_allow_html=True)
     
     st.subheader("Prompt 1 (Fond de décor)")
     st.code(prompt_1, language="text")
@@ -200,9 +209,3 @@ elif "VIDÉO" in etape:
     st.subheader("Prompt 3 (Mouvement)")
     p3 = f"Animation (8s): Mélo in {ville['nom']} in ultra-slow motion. Perfect loop, cinematic PBR."
     st.code(p3, language="text")
-
-# --- 8. EXPORT ---
-st.divider()
-if st.button("💾 EXPORTER TOUS LES PROMPTS DU PLAN"):
-    export = f"PLAN {p_id} | {ville['nom']}\nPROMPT 1: {prompt_1}"
-    st.code(export, language="text")
