@@ -6,163 +6,141 @@ from google.oauth2 import service_account
 from PIL import Image
 
 # --- 1. ADN & BIBLE B22 (LOCKS STRICTS V29) ---
-DNA_MELO = "Bunny-shaped high-end designer toy wearing a blue glossy suit with White round belly with yellow notes, white mitten-like paws. Wearing a blue glass suit (transparent blue glass effect), ultra glossy. Rounded child proportions. Subtle pink translucency inside bunny ears."
-DNA_PIPO = "Microscopic snow-potato companion; white with subtle iridescent multicolor reflections. Dot eyes and small smile; not an animal. Very tiny scale (≈5–10% of Mélo head height) and always close to Mélo. Soft constant glow."
-MATERIAL_MAIN_DNA = "Homogeneous transparent blue glass/jelly, no internal anatomy, high light refraction (IOR 1.5), realistic caustics."
-TECH_LOCKS = "Ultra-realistic cinematic PBR, natural optics, ray-traced reflections, 8k, macro-cinematography, ground level camera."
+DNA_MELO = "Bunny-shaped high-end designer toy wearing a blue glossy suit with White round belly with yellow notes, white mitten-like paws. Wearing a blue glass suit (transparent blue glass effect), ultra glossy. Rounded child proportions."
+DNA_PIPO = "Microscopic snow-potato companion; white with subtle iridescent reflections. Tiny scale (5-10% of Mélo). Soft constant glow."
+TECH_LOCKS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera."
 
-# --- 2. BIBLIOTHÈQUE DE MATÉRIAUX (D8 / D9) ---
-MAT_MAP = {
-    "🍭 SUCRERIES": {
-        "Translucent jelly candy (glossy)": "Translucent jelly candy (glossy), subsurface scattering",
-        "Translucent colored jelly": "Translucent colored jelly candy (glossy), vibrant syrup tones",
-        "Hard candy (polished)": "Hard candy (polished smooth), light refraction",
-        "Marshmallow foam": "Marshmallow foam (matte soft), squishy appearance",
-        "Fondant sugar paste": "Fondant sugar paste (matte), smooth powdery finish",
-        "Honey wax": "Honey wax (warm glow), semi-translucent gold",
-        "Chocolate tri-blend": "Chocolate tri-blend (white, milk, dark – soft marble effect)",
-        "White chocolate velvet": "White chocolate velvet, fine cocoa butter texture"
+# --- 2. BASE DE DONNÉES DÉCORS (LES 80 LIEUX) ---
+DECORS_DB = {
+    "eiffel_paris": {
+        "nom_fr": "La Tour Eiffel (Paris, France)",
+        "items": {
+            1: {"fr": "Le Trocadéro", "en": "The Trocadéro", "cue": "Eiffel Tower clearly recognizable, Paris atmosphere, warm streetlamps bokeh. Specific setting: Le Trocadéro."},
+            2: {"fr": "Les Quais de Seine", "en": "The Seine riverbanks", "cue": "Eiffel Tower clearly recognizable. Specific setting: Les Quais de Seine."},
+            3: {"fr": "Au pied de la Tour", "en": "At the foot of the Tower", "cue": "Industrial metallic lattice, looking up. Specific setting: Au pied de la Tour."},
+            4: {"fr": "Pelouse du Champ-de-Mars", "en": "Champ de Mars lawn", "cue": "Large grass area, distant tower silhouette. Specific setting: Pelouse du Champ-de-Mars."}
+        }
     },
-    "🧶 TEXTILES & MOUSSES": {
-        "Felted wool fabric": "Felted wool fabric, organic soft fibers",
-        "Cotton quilted padding": "Cotton quilted padding, soft cushions, fabric seams",
-        "Velvet microfabric": "Velvet microfabric, light-absorbing soft pile",
-        "Cotton fiber cloud": "Cotton fiber cloud, wispy and ethereal",
-        "Memory foam sponge": "Memory foam sponge, slow-reacting density",
-        "Soft porous sponge": "Soft porous sponge, visible foam cells"
-    },
-    "📜 PAPIER & BOIS": {
-        "Handmade paper (grain)": "Handmade paper (soft grain), raw organic edges",
-        "Paper mâché (smooth)": "Paper mâché (smooth), hardened pulp texture",
-        "Origami layered paper": "Origami layered paper, sharp geometric folds",
-        "Light birch wood": "Light birch wood (soft grain), natural pale wood",
-        "Toy wood (rounded edges)": "Toy wood (rounded edges), smooth lacquered finish",
-        "Milk-painted wood": "Milk-painted wood (pastel), matte chalky wood finish"
-    },
-    "🧩 JOUETS & ARGILE": {
-        "Soft clay (matte)": "Soft clay (matte), hand-molded look",
-        "Porcelain clay": "Porcelain clay (silky matte), high-end ceramic",
-        "Lego": "Lego plastic ABS, high gloss, modular brick surface"
-    }
+    # ... Ajoute les autres destinations sur le même modèle
 }
 
-# --- 3. BASE DE DONNÉES LIEUX (80 LIEUX) ---
-DESTINATIONS = {
-    "eiffel_paris": {"nom": "La Tour Eiffel (Paris, France)", "landmark": "Eiffel Tower", "lieux": {
-        1: {"nom": "Le Trocadéro", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Le Trocadéro. Keep framing stable, no characters, no animals, no text."},
-        2: {"nom": "Les Quais de Seine", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Les Quais de Seine."},
-        3: {"nom": "Au pied de la Tour", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Au pied de la Tour."},
-        4: {"nom": "Pelouse du Champ-de-Mars", "cue": "Ultra-realistic cinematic PBR environment plate, calm, poetic, bedtime-friendly, empty scene. Eiffel Tower clearly recognizable, Paris atmosphere, warm distant streetlamps bokeh. Specific setting: Pelouse du Champ-de-Mars."}}},
-    "mont_saint_michel": {"nom": "Le Mont Saint-Michel (France)", "landmark": "Mont-Saint-Michel", "lieux": {
-        1: {"nom": "La Baie", "cue": "Mont-Saint-Michel silhouette recognizable, tidal bay, ancient stone textures, soft mist. Specific setting: La Baie."},
-        2: {"nom": "La Porte d'Entrée", "cue": "Ancient stone textures, soft mist. Specific setting: La Porte d'Entrée."},
-        3: {"nom": "Le Cloître", "cue": "Ancient stone textures, soft mist. Specific setting: Le Cloître."},
-        4: {"nom": "Les Dunes", "cue": "Ancient stone textures, soft mist. Specific setting: Les Dunes."}}},
-    "santorini_greece": {"nom": "Santorin (Grèce)", "landmark": "Santorini architecture", "lieux": {
-        1: {"nom": "La Vue Haute", "cue": "Santorini whitewashed architecture, blue domes, Aegean sea horizon."},
-        2: {"nom": "La Ruelle Blanche", "cue": "Santorini whitewashed architecture, blue domes."},
-        3: {"nom": "La Terrasse", "cue": "Santorini whitewashed architecture, blue domes."},
-        4: {"nom": "Le Muret", "cue": "Santorini whitewashed architecture, blue domes."}}}
+# --- 3. PLAN DE RÉALISATION (EXTRAIT XLSX) ---
+PLANS_DB = {
+    1: {"Angle": "wide-angle lens", "Light": "Golden Hour", "M_Act": "Arrival (grey/misty landscape)", "P_Act": "Pipo floats next to Melo"},
+    2: {"Angle": "medium framing", "Light": "Golden Hour", "M_Act": "Melo rubs his eyes", "P_Act": "Pipo peeks playfully"},
+    3: {"Angle": "static close-up", "Light": "Sunset", "M_Act": "Melo watches Pipo glow", "P_Act": "Pipo hovers as a guide"},
 }
 
 # --- 4. CONFIGURATION UI ---
-st.set_page_config(page_title="Melo Production Master", layout="wide")
-st.markdown("""
-    <style>
-    .info-card { background-color: #ffffff; border-left: 5px solid #007BFF; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
-    .action-title { color: #007BFF; font-weight: bold; font-size: 0.85em; text-transform: uppercase; }
-    .action-text { color: #333333; font-size: 1.1em; font-weight: 500; margin-top: 5px; }
-    </style>
-    """, unsafe_allow_html=True)
+st.set_page_config(page_title="Melo Integrated Studio", layout="wide")
 
-etape = st.radio("ÉTAPE ACTUELLE :", ["🖼️ 1. DÉCOR (FOND)", "🎨 2. IMAGE (PERSONNAGES)", "🎞️ 3. VIDÉO (MOUVEMENT)"], horizontal=True)
-st.divider()
-
-# --- 5. SIDEBAR (PILOTAGE XLSX) ---
+# --- 5. LOGIQUE SIDEBAR (GLOBAL) ---
 with st.sidebar:
     st.title("🎬 STUDIO MÉLO")
-    mode_manuel = st.toggle("ACTIVER LE CONTRÔLE MANUEL (E7)", value=False)
-    e7 = "yes" if mode_manuel else "no"
+    e7_bool = st.toggle("🕹️ ACTIVER MODE MANUEL (E7)", value=False)
+    e7 = "yes" if e7_bool else "no"
     
-    v_id = st.selectbox("DESTINATION (B9)", list(DESTINATIONS.keys()), format_func=lambda x: DESTINATIONS[x]['nom'])
-    p_id = st.select_slider("PLAN (Scénario)", options=list(range(1, 21)))
+    st.divider()
+    v_key = st.selectbox("DESTINATION (B9)", list(DECORS_DB.keys()), format_func=lambda x: DECORS_DB[x]['nom_fr'])
+    p_id = st.select_slider("NUMÉRO DU PLAN", options=list(range(1, 21)))
     
-    ville = DESTINATIONS[v_id]
-    auto_b5 = ((p_id - 1) % 4) + 1
+    ville = DECORS_DB[v_key]
+    plan = PLANS_DB.get(p_id, PLANS_DB[1])
+    auto_b5_id = ((p_id - 1) % 4) + 1
+
+# --- 6. INTERFACE ONGLETS ---
+tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (FOND)", "🎨 2. IMAGE (PERSOS)", "🎞️ 3. VIDÉO"])
+
+# --- ONGLET 1 : DÉCOR ---
+with tab1:
+    st.write(f"### ⚙️ Configuration du Décor — {ville['nom_fr']}")
+    c1, c2, c3 = st.columns(3)
     
-    # Valeurs par défaut
-    b6, b7, b8, b10, b11 = "wide-angle lens", "Golden Hour", "calm", "dry", "none"
-    d8_val, d9_val = "Marshmallow foam", "none"
-    i34, i35 = "low-angle ground perspective", "bedtime-friendly soft light"
-
-    if mode_manuel:
-        st.divider()
-        b5_id = st.selectbox("LIEU PRÉCIS (E5)", [1, 2, 3, 4], index=auto_b5-1, format_func=lambda x: ville['lieux'][x]['nom'])
-        b7 = st.selectbox("LUMIÈRE (B7)", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"])
-        cat_d8 = st.selectbox("CATEGORIE D8", list(MAT_MAP.keys()))
-        d8_ui = st.selectbox("MATÉRIEL D8", list(MAT_MAP[cat_d8].keys()))
-        d8_val = MAT_MAP[cat_d8][d8_ui]
-        
-        cat_d9 = st.selectbox("CATEGORIE D9", ["none"] + list(MAT_MAP.keys()))
-        if cat_d9 != "none":
-            d9_ui = st.selectbox("MATÉRIEL D9", list(MAT_MAP[cat_d9].keys()))
-            d9_val = MAT_MAP[cat_d9][d9_ui]
-        
-        b10 = st.text_input("SOL (B10)", value="dry")
-        b11 = st.selectbox("1er PLAN (B11)", ["none", "wild flowers", "puddles", "leaves"])
-        i35 = st.text_input("MANUAL LIGHT (I35)", value="bedtime-friendly soft light")
-    else:
-        b5_id = auto_b5
-
-# --- 6. CALCUL FORMULE XLSX (PROMPT 1) ---
-final_light = i35 if e7 == "yes" else b7
-final_angle = i34 if e7 == "yes" else b6
-b12 = ville['lieux'][b5_id]['cue']
-
-fg_str = f"In the immediate foreground, a subtle {b11} adds volumetric depth; " if b11 != "none" else ""
-mat_sec = f" and {d9_val}" if d9_val != "none" else ""
-sugar = "sugar-coated crystalline textures" if "candy" in d8_val.lower() else "polished finishes"
-
-prompt_1 = (
-    f"An ultra-detailed cinematic environment photography of {ville['lieux'][b5_id]['nom']}. "
-    f"The scene is set in {ville['nom']} during the {final_light}, with a {b8} atmosphere. "
-    f"The camera uses a {final_angle} with a low-angle ground perspective. {fg_str}"
-    f"MATERIAL WORLD & SHADING: All surfaces reimagined in {d8_val}{mat_sec}. "
-    f"Surfaces feature realistic subsurface scattering and {sugar}. "
-    f"COMPOSITION: Minimalist, clean, with large negative space. The landmark is a distant silhouette. "
-    f"LIGHTING: Soft cinematic bokeh, gentle volumetric god-rays. GROUND: {b10}. "
-    f"PLATE CUES (STRICT): {b12}. "
-    f"RULES: No characters, no people, no text. Pure background plate."
-)
-
-# --- 7. ZONE D'AFFICHAGE ET RENDU ---
-st.title(f"📍 {ville['nom']} — {ville['lieux'][b5_id]['nom']}")
-
-if "DÉCOR" in etape:
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(f'<div class="info-card"><div class="action-title">📍 LIEU PRÉCIS (E5)</div><div class="action-text">{ville["lieux"][b5_id]["nom"]}</div></div>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<div class="info-card"><div class="action-title">📸 ANGLE / SOL</div><div class="action-text">{final_angle} | {b10}</div></div>', unsafe_allow_html=True)
-    with c3: st.markdown(f'<div class="info-card"><div class="action-title">🌅 LUMIÈRE (B7/I35)</div><div class="action-text">{final_light}</div></div>', unsafe_allow_html=True)
-    with c4: st.markdown(f'<div class="info-card"><div class="action-title">🍭 MATÉRIEL (D8)</div><div class="action-text">{d8_val[:15]}...</div></div>', unsafe_allow_html=True)
+    with c1:
+        # E5 (Lieu Précis)
+        b5_val = st.selectbox("LIEU PRÉCIS (E5)", [1,2,3,4], index=auto_b5_id-1, format_func=lambda x: ville['items'][x]['fr'], disabled=not e7_bool)
+        # B6 / I34
+        angles_list = ["wide-angle lens", "macro lens", "ground perspective", "eye-level"]
+        b6_idx = angles_list.index(plan['Angle']) if plan['Angle'] in angles_list else 0
+        b6_final = st.selectbox("ANGLE (B6/I34)", angles_list, index=b6_idx, disabled=not e7_bool)
     
-    st.subheader("Prompt 1 (Fond de décor - Formule XLSX)")
-    st.code(prompt_1, language="text")
-    
-    if st.button("🚀 LANCER RENDU VERTEX ULTRA"):
-        if "gcp_service_account" in st.secrets:
-            creds = service_account.Credentials.from_service_account_info(st.secrets["gcp_service_account"])
-            aiplatform.init(project="melo-prompt-generator", location="us-central1", credentials=creds)
-            model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
-            with st.spinner("Nanobanana Pro calcule..."):
+    with c2:
+        # B7 / I35
+        lights_list = ["Golden Hour", "Blue Hour", "Sunset", "Deep Night"]
+        b7_idx = lights_list.index(plan['Light']) if plan['Light'] in lights_list else 0
+        b7_final = st.selectbox("LUMIÈRE (B7/I35)", lights_list, index=b7_idx, disabled=not e7_bool)
+        b8_final = st.selectbox("AMBIANCE (B8)", ["calm", "mysterious", "joyful"], disabled=not e7_bool)
+        b11_final = st.selectbox("1ER PLAN (B11)", ["none", "flowers", "leaves", "mist"], disabled=not e7_bool)
+
+    with c3:
+        d8_final = st.selectbox("MATIÈRE D8", ["marshmallow", "jelly candy", "felted wool", "candy"], disabled=not e7_bool)
+        d9_final = st.selectbox("MATIÈRE D9", ["none", "frosted glass", "gold dust"], disabled=not e7_bool)
+        b10_final = st.text_input("SOL (B10)", value="dry", disabled=not e7_bool)
+
+    # FORMULE PROMPT 1 (XLSX)
+    e5_en = ville['items'][b5_val]['en']
+    b12_cue = ville['items'][b5_val]['cue']
+    d9_str = f" and {d9_final}" if d9_final != "none" else ""
+    b11_str = f"In the immediate foreground, a subtle {b11_final} adds volumetric depth; " if b11_final != "none" else ""
+    texture_logic = "sugar-coated crystalline textures" if "candy" in d8_final.lower() else "polished finishes"
+
+    prompt_1 = (
+        f"An ultra-detailed cinematic environment photography of {e5_en}. "
+        f"The scene is set in {ville['nom_fr']} during the {b7_final}, with a {b8_final} atmosphere. "
+        f"The camera uses a {b6_final} with a low-angle ground perspective. {b11_str}"
+        f"MATERIAL WORLD: All architecture reimagined in {d8_final}{d9_str}. "
+        f"Surfaces feature realistic subsurface scattering and {texture_logic}. "
+        f"GROUND: {b10_final}. PLATE CUES (STRICT): {b12_cue}. "
+        f"RULES: No characters, pure background plate."
+    )
+    st.divider()
+    st.code(prompt_1)
+
+# --- ONGLET 2 : PERSONNAGES ---
+with tab2:
+    st.write("### 🎨 Configuration Mélo & Pipo")
+    ic1, ic2 = st.columns(2)
+    with ic1:
+        # Actions récupérées du Plan de réalisation
+        a_m_final = st.text_input("ACTION MÉLO (A_M)", value=plan['M_Act'], disabled=not e7_bool)
+        a_p_final = st.text_input("ACTION PIPO (A_P)", value=plan['P_Act'], disabled=not e7_bool)
+    with ic2:
+        s_expr = st.selectbox("EXPRESSION", ["curious", "amazed", "smiling", "sleepy"], disabled=not e7_bool)
+        s_acc = st.text_input("ACCESSOIRES", value="none", disabled=not e7_bool)
+
+    prompt_2 = (
+        f"A high-end cinematic character photography. "
+        f"{DNA_MELO} ACTION: {a_m_final}. EXPRESSION: {s_expr}. "
+        f"{DNA_PIPO} ACTION: {a_p_final}. "
+        f"INTEGRATION: Placed in {e5_en} ({ville['nom_fr']}). {TECH_LOCKS}"
+    )
+    st.code(prompt_2)
+
+# --- MOTEUR DE RENDU VERTEX ---
+def init_vertex():
+    if "gcp_service_account" in st.secrets:
+        creds = service_account.Credentials.from_service_account_info(st.secrets["gcp_service_account"])
+        aiplatform.init(project="melo-prompt-generator", location="us-central1", credentials=creds)
+        return True
+    return False
+
+st.divider()
+col_btn1, col_btn2 = st.columns(2)
+with col_btn1:
+    if st.button("🚀 LANCER RENDU (IMAGE ACTIVE)"):
+        if init_vertex():
+            with st.spinner("Rendu Nanobanana Pro..."):
+                model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
+                # Envoie le prompt de l'onglet actif (Simplifié ici pour prompt_1)
                 imgs = model.generate_images(prompt=prompt_1, number_of_images=1, aspect_ratio="16:9")
                 st.image(imgs[0]._pil_image, use_column_width=True)
 
-elif "IMAGE" in etape:
-    st.subheader("Prompt 2 (Intégration B22)")
-    p2 = f"Character Study: MÉLO ({DNA_MELO}) and PIPO ({DNA_PIPO}). Integration in {ville['lieux'][b5_id]['nom']}. [LOCKS]: {TECH_LOCKS}."
-    st.code(p2, language="text")
-
-elif "VIDÉO" in etape:
-    st.subheader("Prompt 3 (Mouvement)")
-    p3 = f"Animation (8s): Mélo in {ville['nom']} in ultra-slow motion. Perfect loop. 4k cinematic."
-    st.code(p3, language="text")
+with col_btn2:
+    if st.button("🔥 BATCH PRODUCTION (DÉCOR x4)"):
+        if init_vertex():
+            with st.spinner("Série de 4 en cours..."):
+                model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
+                batch = model.generate_images(prompt=prompt_1, number_of_images=4, aspect_ratio="16:9")
+                cols = st.columns(2)
+                for i, img in enumerate(batch):
+                    with cols[i%2]: st.image(img._pil_image)
