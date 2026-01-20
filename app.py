@@ -1,6 +1,6 @@
 import streamlit as st
 
-# --- 1. ADN & BIBLE B22 (ANGLAIS) ---
+# --- 1. BIBLE B22 : DNA & LOCKS (ANGLAIS) ---
 DNA_MELO = "Bunny-shaped high-end designer toy. Blue glass suit (transparent blue glass effect), ultra-glossy. White round belly with yellow notes, white mitten-like paws. Rounded child proportions."
 DNA_PIPO = "Microscopic snow-potato companion (5-10% scale). Dot eyes and small smile."
 MATERIAL_B22 = "Homogeneous transparent blue glass, no internal anatomy, high IOR 1.5, caustics, micro-reflections."
@@ -24,22 +24,29 @@ PLANS_DATA[18].update({"B_M_FR": "Énorme bâillement lent", "B_M_EN": "Huge, sl
 PLANS_DATA[20].update({"B_M_FR": "S'endort paisiblement", "B_M_EN": "Deep peaceful sleep"})
 
 # --- 3. CONFIGURATION & STYLE ---
-st.set_page_config(page_title="Mélo Studio Pro", layout="wide")
+st.set_page_config(page_title="Mélo Production Hub", layout="wide")
 st.markdown("""
     <style>
     .info-card { background-color: #ffffff; border-left: 5px solid #007BFF; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
     .action-title { color: #007BFF; font-weight: bold; font-size: 0.85em; text-transform: uppercase; }
     .action-text { color: #333333; font-size: 1.1em; font-weight: 500; margin-top: 5px; }
+    /* Style pour simuler des onglets avec le radio */
+    .stRadio > div { flex-direction: row; gap: 20px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 4. INITIALISATION DES VARIABLES (ANTI-NAMEERROR) ---
-if 'active_tab' not in st.session_state: st.session_state.active_tab = "🖼️ 1. DÉCOR"
+# --- 4. NAVIGATION PRINCIPALE (REMPLACE LES TABS POUR LA DYNAMIQUE) ---
+# On place le sélecteur d'étape en haut de la zone principale
+etape = st.radio("SÉLECTIONNER L'ÉTAPE DE PRODUCTION :", 
+                 ["🖼️ 1. DÉCOR (PLATE)", "🎨 2. IMAGE (INTÉGRATION)", "🎞️ 3. VIDÉO (MOUVEMENT)"],
+                 horizontal=True)
 
-# --- 5. LOGIQUE DE CALCUL (AVANT AFFICHAGE) ---
+st.divider()
+
+# --- 5. LOGIQUE DE CALCUL & SIDEBAR ---
 with st.sidebar:
     st.title("🎬 PILOTAGE")
-    mode = st.radio("CONTRÔLE", ["🤖 AUTOMATIQUE", "🕹️ MANUEL"])
+    mode = st.radio("MODE DE CONTRÔLE", ["🤖 AUTOMATIQUE", "🕹️ MANUEL"])
     v_id = st.selectbox("DESTINATION", list(DESTINATIONS.keys()), format_func=lambda x: DESTINATIONS[x]['nom'])
     p_id = st.select_slider("NUMÉRO DU PLAN", options=list(PLANS_DATA.keys()))
     
@@ -47,7 +54,7 @@ with st.sidebar:
     plan = PLANS_DATA[p_id]
     auto_d_id = (p_id - 1) // 5 + 1
     
-    # Initialisation par défaut (Auto)
+    # 1. INITIALISATION DES VALEURS PAR DÉFAUT (AUTO)
     s_decor_ui = ville['decors'][auto_d_id]['ui']
     s_decor_en = ville['decors'][auto_d_id]['en']
     s_action_fr = plan[f"{ville['struct']}_M_FR"]
@@ -57,56 +64,56 @@ with st.sidebar:
     s_paws_fr, s_paws_en = "Détendu", "relaxed"
     s_gaze_fr, s_gaze_en = "Vers l'horizon", "horizon"
     s_material = MATERIAL_B22
-    s_pipo_col = "Nacré irisé"
-    s_energy = "Minimaliste"
+    s_pipo_col_fr, s_pipo_col_en = "Nacré irisé", "iridescent multicolor reflections"
+    s_energy_fr, s_energy_en = "Minimaliste", "minimal bedtime-friendly energy trail"
 
+    # 2. SURCHARGE MANUELLE SI BESOIN
     if mode == "🕹️ MANUEL":
         st.divider()
-        st.subheader("🛠️ RÉGLAGES CONTEXTUELS")
-        # Ici la barre latérale change selon l'onglet cliqué à droite
-        if "DÉCOR" in st.session_state.active_tab:
-            m_d_id = st.selectbox("Décor spécifique", [1,2,3,4], index=auto_d_id-1, format_func=lambda x: ville['decors'][x]['ui'])
+        st.subheader("🛠️ AJUSTEMENTS MANUELS")
+        
+        if "DÉCOR" in etape:
+            m_d_id = st.selectbox("Choisir le décor", [1,2,3,4], index=auto_d_id-1, format_func=lambda x: ville['decors'][x]['ui'])
             s_decor_ui, s_decor_en = ville['decors'][m_d_id]['ui'], ville['decors'][m_d_id]['en']
             s_light_ui = st.selectbox("Horaire", ["Aube", "Midi", "Crépuscule", "Nuit"])
+            s_light_en = "Golden Hour" if s_light_ui == "Aube" else "Deep Night"
             
-        elif "IMAGE" in st.session_state.active_tab:
-            s_paws_fr = st.selectbox("Position Pattes", ["Détendu", "Patte levée", "Bras croisés"])
+        elif "IMAGE" in etape:
+            s_paws_fr = st.selectbox("Position Pattes", ["Détendu", "Patte levée", "Bras croisés", "Derrière le dos"])
+            s_paws_en = "relaxed" if s_paws_fr == "Détendu" else "one paw raised"
             s_gaze_fr = st.selectbox("Regard", ["Droit devant", "Vers Pipo", "Vers l'horizon"])
-            s_pipo_col = st.selectbox("Couleur Pipo", ["Nacré irisé", "Lueur blanche", "Multicolore"])
-            s_material = st.selectbox("Matière Mélo", [MATERIAL_B22, "Verre Satiné", "Gélatineux"])
+            s_pipo_col_fr = st.selectbox("Couleur Pipo", ["Nacré irisé", "Lueur blanche", "Multicolore"])
+            s_material = st.selectbox("Rendu Verre Mélo", [MATERIAL_B22, "Verre Satiné", "Effet Gélatineux"])
             
-        elif "VIDÉO" in st.session_state.active_tab:
+        elif "VIDÉO" in etape:
             s_action_fr = st.text_input("Mouvement (FR)", value=plan[f"{ville['struct']}_M_FR"])
-            s_energy = st.selectbox("Trainée Énergie", ["Minimaliste", "Ruban éthéré", "Forte"])
-            s_speed = st.selectbox("Vitesse", ["Ultra-Slow", "Slow-Motion"])
+            s_action_en = "Huge slow yawn" if "bâillement" in s_action_fr else "Slow breathing motion"
+            s_energy_fr = st.selectbox("Trainée Énergie Pipo", ["Minimaliste", "Ruban éthéré", "Lueur traînante"])
+            s_energy_en = "minimal bedtime-friendly energy trail"
 
-# --- 6. ZONE PRINCIPALE AVEC ONGLETS ---
+# --- 6. ZONE D'AFFICHAGE (MAIN AREA) ---
 st.title(f"📍 {ville['nom']} — Plan {p_id}")
 
-tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (PLATE)", "🎨 2. IMAGE (INTÉGRATION)", "🎞️ 3. VIDÉO (MOUVEMENT)"])
-
-# Détection de l'onglet actif pour la Sidebar au prochain tour
-with tab1:
-    st.session_state.active_tab = "🖼️ 1. DÉCOR"
+if "DÉCOR" in etape:
     c1, c2 = st.columns(2)
     with c1: st.markdown(f'<div class="info-card"><div class="action-title">📍 DÉCOR</div><div class="action-text">{s_decor_ui}</div></div>', unsafe_allow_html=True)
     with c2: st.markdown(f'<div class="info-card"><div class="action-title">🌅 AMBIANCE</div><div class="action-text">{s_light_ui}</div></div>', unsafe_allow_html=True)
-    st.subheader("Prompt Décor")
+    st.subheader("Prompt Décor (Solid Plate)")
     st.code(f"Environment Plate: {s_decor_en} {s_light_en}. --ar 16:9")
 
-with tab2:
-    st.session_state.active_tab = "🎨 2. IMAGE"
+elif "IMAGE" in etape:
     c1, c2, c3 = st.columns(3)
     with c1: st.markdown(f'<div class="info-card"><div class="action-title">🎭 ACTION</div><div class="action-text">{s_action_fr}</div></div>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<div class="info-card"><div class="action-title">💎 MATIÈRE</div><div class="action-text">{s_material[:20]}...</div></div>', unsafe_allow_html=True)
-    with c3: st.markdown(f'<div class="info-card"><div class="action-title">✨ PIPO</div><div class="action-text">{s_pipo_col}</div></div>', unsafe_allow_html=True)
-    st.subheader("Prompt Intégration")
-    st.code(f"Integration: MÉLO ({DNA_MELO}). Material: {s_material}. Pipo: {DNA_PIPO} with {s_pipo_col} reflections. Pose: {s_action_en}. {TECH_LOCKS}. --ar 16:9")
+    with c2: st.markdown(f'<div class="info-card"><div class="action-title">🐾 ANATOMIE</div><div class="action-text">{s_paws_fr} | {s_gaze_fr}</div></div>', unsafe_allow_html=True)
+    with c3: st.markdown(f'<div class="info-card"><div class="action-title">✨ PIPO</div><div class="action-text">{s_pipo_col_fr}</div></div>', unsafe_allow_html=True)
+    st.subheader("Prompt Intégration (B22 Specs)")
+    p2 = f"Integration: MÉLO ({DNA_MELO}). Material: {s_material}. Pipo: {DNA_PIPO} with {s_pipo_col_en}. Pose: {s_action_en}. {TECH_LOCKS}. --ar 16:9"
+    st.code(p2)
 
-with tab3:
-    st.session_state.active_tab = "🎞️ 3. VIDÉO"
+elif "VIDÉO" in etape:
     c1, c2 = st.columns(2)
     with c1: st.markdown(f'<div class="info-card"><div class="action-title">🎞️ MOUVEMENT</div><div class="action-text">{s_action_fr}</div></div>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<div class="info-card"><div class="action-title">🚀 ÉNERGIE</div><div class="action-text">{s_energy}</div></div>', unsafe_allow_html=True)
-    st.subheader("Prompt Vidéo")
-    st.code(f"Animation (8s): {s_action_en} in ultra-slow motion. Pipo energy: {s_energy}. Perfect loop.")
+    with c2: st.markdown(f'<div class="info-card"><div class="action-title">🚀 ÉNERGIE PIPO</div><div class="action-text">{s_energy_fr}</div></div>', unsafe_allow_html=True)
+    st.subheader("Prompt Vidéo (Veo 3)")
+    p3 = f"Animation (8s): {s_action_en} in ultra-slow motion. Pipo energy: {s_energy_en}. Perfect loop."
+    st.code(p3)
