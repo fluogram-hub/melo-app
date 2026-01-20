@@ -1,98 +1,102 @@
 import streamlit as st
 
-# --- 1. ADN & LOCKS (BIBLE B22) ---
-MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes. Body: Transparent blue Glass Suit, ultra-glossy finish. Appendages: Long blue ribbons."
-PIPO_DNA = "Small spirit companion, white snow-potato shape, iridescent soft glow."
-VERROUS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera, ray-traced reflections."
+# --- 1. CONFIGURATION VISUELLE ---
+st.set_page_config(page_title="Mélo Studio Pro", layout="wide")
 
-# --- 2. DONNÉES LIEUX ---
+# Style personnalisé pour améliorer la lisibilité
+st.markdown("""
+    <style>
+    .reportview-container { background: #f0f2f6; }
+    .stCode { background-color: #1e1e1e !important; color: #d4d4d4 !important; border-radius: 10px; }
+    .main-title { font-size: 32px; font-weight: bold; color: #0e1117; margin-bottom: 20px; }
+    .section-header { font-size: 20px; font-weight: bold; color: #007bff; margin-top: 20px; }
+    .metric-container { background: white; padding: 15px; border-radius: 10px; border: 1px solid #e6e9ef; }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- 2. DONNÉES (LIEUX & PLANS) ---
 LIEUX = {
-    "eiffel_paris": {"name": "Paris", "struct": "B", "obj": "Red beret", "animal": "Poodle", "plate": "Empty stone esplanade, blurry Eiffel Tower silhouette."},
-    "venice_italy": {"name": "Venise", "struct": "C", "obj": "Cat mask", "animal": "White pigeon", "plate": "Dark calm water, ripples, blurry palaces."},
-    "taj_mahal_india": {"name": "Taj Mahal", "struct": "A", "obj": "Oil lantern", "animal": "Peacock", "plate": "Symmetrical white marble, reflecting pool."}
+    "eiffel_paris": {"name": "Paris", "struct": "B", "obj": "Béret rouge", "animal": "Caniche", "plate": "Esplanade vide, Tour Eiffel floue au loin."},
+    "venice_italy": {"name": "Venise", "struct": "C", "obj": "Masque de chat", "animal": "Pigeon blanc", "plate": "Eau calme, palais flous en arrière-plan."},
+    "lapland_arctic": {"name": "Laponie", "struct": "A", "obj": "Chocolat chaud", "animal": "Renne", "plate": "Neige immaculée, aurore boréale douce."}
 }
 
-# --- 3. OPTIONS DE DIRECTION D'ACTEUR ---
-EXPRESSIONS = ["Curiosité calme", "Sourire doux", "Émerveillement", "Somnolence", "Concentration"]
-REGARDS = ["Droit devant", "Vers Pipo", "Vers l'horizon", "Vers l'accessoire", "Vers le sol"]
-POSES_PATTES = ["Détendu", "Bras croisés", "Patte levée", "Pattes derrière le dos", "S'accroche à l'objet"]
-ACTIONS_VIDEO = [
-    "Respiration lente (mouvement d'épaules)", 
-    "Hochement de tête très lent", 
-    "Clignement d'yeux et petit sourire", 
-    "Salut de la patte très lent", 
-    "Sert l'accessoire contre lui", 
-    "Se tourne lentement vers la caméra"
-]
+# Paramètres par défaut pour le mode Auto
+AUTO_CONFIG = {
+    "light": "Golden Hour", "weather": "Clear Sky", "expr": "Curiosité calme", 
+    "gaze": "Vers l'horizon", "paws": "Détendu", "action": "Respiration lente"
+}
 
-# --- 4. INTERFACE ---
-st.set_page_config(page_title="Mélo Video Studio", layout="wide")
-st.title("🎬 Mélo Studio : Direction & Mouvement")
-
+# --- 3. BARRE LATÉRALE (CONTRÔLES) ---
 with st.sidebar:
-    st.header("🎯 Paramètres de Production")
-    mode = st.radio("Mode", ["Automatique (Excel)", "Manuel (Custom)"])
-    l_id = st.selectbox("Lieu", list(LIEUX.keys()), format_func=lambda x: LIEUX[x]['name'])
-    p_id = st.number_input("Séquence n°", 1, 20, 1)
+    st.markdown("<div class='main-title'>🎬 RÉGLAGES</div>", unsafe_allow_html=True)
+    
+    mode = st.radio("Système de contrôle", ["🤖 AUTOMATIQUE", "🕹️ MANUEL"])
     
     st.divider()
     
-    lieu = LIEUX[l_id]
+    lieu_id = st.selectbox("Destination", list(LIEUX.keys()), format_func=lambda x: LIEUX[x]['name'])
+    plan_id = st.number_input("Numéro du Plan", 1, 20, 1)
     
-    if mode == "Automatique (Excel)":
-        st.info("💡 Mode Auto activé")
-        s_light, s_weather = "Golden Hour", "Clear Sky"
-        s_expr, s_gaze, s_paws, s_video = EXPRESSIONS[0], REGARDS[0], POSES_PATTES[0], ACTIONS_VIDEO[0]
-        s_acc = lieu["obj"]
+    if mode == "🤖 AUTOMATIQUE":
+        # En mode auto, on affiche les valeurs mais on ne peut pas les changer
+        st.success("Mode automatique activé. L'appli suit la bible Excel.")
+        h_val, m_val, e_val = AUTO_CONFIG["light"], AUTO_CONFIG["weather"], AUTO_CONFIG["expr"]
+        g_val, p_val, a_val = AUTO_CONFIG["gaze"], AUTO_CONFIG["paws"], AUTO_CONFIG["action"]
+        acc_val = LIEUX[lieu_id]["obj"]
     else:
-        st.warning("🕹️ Mode Manuel activé")
-        s_light = st.selectbox("Horaire", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"])
-        s_weather = st.selectbox("Météo", ["Clear Sky", "Heavy Rain", "Soft Snow", "Misty"])
-        s_expr = st.selectbox("Expression", EXPRESSIONS)
-        s_gaze = st.selectbox("Regard", REGARDS)
-        s_paws = st.selectbox("Position des pattes", POSES_PATTES)
-        s_video = st.selectbox("Mouvement Vidéo (8s)", ACTIONS_VIDEO)
-        s_acc = st.text_input("Accessoire", value=lieu["obj"])
+        st.warning("Mode manuel : définissez vos propres poses.")
+        h_val = st.selectbox("Horaire", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"])
+        m_val = st.selectbox("Météo", ["Clear Sky", "Heavy Rain", "Soft Snow", "Misty"])
+        e_val = st.selectbox("Expression", ["Curiosité", "Sourire doux", "Émerveillement", "Somnolence"])
+        g_val = st.selectbox("Regard", ["Droit devant", "Vers Pipo", "Vers l'horizon", "Vers l'objet"])
+        p_val = st.selectbox("Anatomie (Pattes)", ["Détendu", "Patte gauche levée", "Bras croisés", "Pattes derrière le dos", "S'accroche à l'objet"])
+        a_val = st.selectbox("Mouvement Vidéo", ["Respiration", "Salut lent", "Hochement de tête", "Sert l'objet"])
+        acc_val = st.text_input("Accessoire de Mélo", value=LIEUX[lieu_id]["obj"])
 
-# --- 5. DASHBOARD LISIBLE ---
-st.markdown(f"### 📋 Fiche Technique : {lieu['name']} | Plan {p_id}")
+# --- 4. AFFICHAGE PRINCIPAL (LISIBILITÉ) ---
+st.markdown(f"<div class='main-title'>PLATEAU : {LIEUX[lieu_id]['name']} | PLAN {plan_id}</div>", unsafe_allow_html=True)
 
-# Organisation en tuiles pour une lecture instantanée
+# Dashboard de lecture rapide (Horizontal et aéré)
+st.markdown("<div class='section-header'>📋 FICHE TECHNIQUE ACTUELLE</div>", unsafe_allow_html=True)
 c1, c2, c3, c4 = st.columns(4)
 with c1:
-    st.help("**Ambiance**\n\n" + f"{s_light}\n\n{s_weather}")
+    st.markdown(f"**ATMOSPHÈRE**\n\n🌅 {h_val}\n\n☁️ {m_val}")
 with c2:
-    st.help("**Visage**\n\n" + f"{s_expr}\n\nRegard: {s_gaze}")
+    st.markdown(f"**VISAGE**\n\n🎭 {e_val}\n\n👁️ Regard: {g_val}")
 with c3:
-    st.help("**Corps**\n\n" + f"{s_paws}\n\nAcc: {s_acc}")
+    st.markdown(f"**CORPS & OBJET**\n\n🐾 {p_val}\n\n🎒 {acc_val}")
 with c4:
-    st.help("**Vidéo**\n\n" + f"Action: {s_video}")
+    st.markdown(f"**MOUVEMENT**\n\n🎞️ {a_val}")
 
 st.divider()
 
-# --- 6. GÉNÉRATION DES PROMPTS (TABS LISIBLES) ---
-melo_stat = f"Pose: {s_paws}. Gaze: {s_gaze}. Expression: {s_expr}. Accessory: {s_acc}."
-atmo = f"{s_light}, {s_weather}."
+# --- 5. LES PROMPTS (DANS DES BLOCS SÉPARÉS) ---
+st.markdown("<div class='section-header'>🚀 GÉNÉRATEUR DE PROMPTS</div>", unsafe_allow_html=True)
 
-tabs = st.tabs(["🖼️ 1. DÉCOR (PLATE)", "🎨 2. IMAGE (INTEGRATION)", "🎞️ 3. VIDÉO (MOUVEMENT)"])
+# Onglets larges et lisibles
+tab1, tab2, tab3 = st.tabs(["[ 1. FOND ]", "[ 2. IMAGE ]", "[ 3. VIDÉO ]"])
 
-with tabs[0]:
-    st.markdown("#### `Générer le décor vide d'abord`")
-    p1 = f"Environment Plate: {lieu['plate']} {atmo} POETIC, MINIMALIST. --ar 16:9"
+with tab1:
+    st.write("### 🖼️ Prompt Décor (Master Plate)")
+    st.markdown("*Générez d'abord le fond vide pour garantir la stabilité.*")
+    p1 = f"Environment: {LIEUX[lieu_id]['plate']} Time: {h_val}. Weather: {m_val}. POETIC, MINIMALIST. --ar 16:9"
     st.code(p1, language="text")
 
-with tabs[1]:
-    st.markdown("#### `Intégrer Mélo & Pipo (Image-to-Image)`")
-    p2 = f"Integration: {MELO_DNA}. {melo_stat} Companion: {PIPO_DNA}. Location: {lieu['name']}. {atmo} [VERROUS]: {VERROUS}."
+with tab2:
+    st.write("### 🎨 Prompt Intégration (Nanobanana)")
+    st.markdown("*Utilisez ce prompt pour placer Mélo et Pipo dans le décor.*")
+    melo_spec = f"Melo pose: {p_val}, gaze: {g_val}, expression: {e_val}, holding: {acc_val}."
+    p2 = f"Integration: 45cm blue Glass Suit character. {melo_spec} Companion: Pipo (small white spirit). {h_val}, {m_val}. [LOCKS]: Cinematic PBR, 8k. --ar 16:9"
     st.code(p2, language="text")
 
-with tabs[2]:
-    st.markdown("#### `Animer la scène (8 secondes)`")
-    # L'action vidéo est ici la clé du prompt Veo 3
-    p3 = f"Animation (8s): {s_video}. Melo is {s_expr} while looking {s_gaze}. Ultra-slow motion. Inertia on ribbons. {s_weather} particles. Perfect loop, cinematic PBR."
+with tab3:
+    st.write("### 🎞️ Prompt Animation (Veo 3)")
+    st.markdown("*Utilisez ce prompt pour créer le mouvement de 8 secondes.*")
+    p3 = f"Animation (8s): {a_val} in ultra-slow motion. Melo looking {g_val}. Pipo trailing soft light. {m_val} effects. Perfect loop, cinematic PBR."
     st.code(p3, language="text")
 
-# --- 7. EXPORT ---
-with st.expander("💾 Sauvegarder la configuration du plan"):
-    final_log = f"PLAN_{p_id}_{lieu['name']}: {s_expr} | {s_paws} | {s_video} | {s_light}"
-    st.text_area("Copie cette ligne pour ton suivi de production", final_log)
+# --- 6. EXPORT ---
+st.divider()
+with st.expander("💾 EXPORTER LA CONFIGURATION"):
+    st.text_area("Copier le récapitulatif", f"PLAN_{plan_id}_{LIEUX[lieu_id]['name']}: {h_val}/{m_val} | {p_val}/{g_val} | {a_val}")
