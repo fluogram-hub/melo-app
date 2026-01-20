@@ -5,70 +5,81 @@ from vertexai.preview.vision_models import ImageGenerationModel
 from google.oauth2 import service_account
 from PIL import Image
 
-# --- 1. ADN & CONFIGURATION ---
+# --- 1. ADN & BIBLE MÉLO (LOCKS) ---
 DNA_MELO = "Bunny-shaped high-end designer toy, blue glass suit, ultra glossy, white round belly, white paws."
 DNA_PIPO = "Microscopic snow-potato companion, iridescent, soft glow."
 TECH_LOCKS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera."
 
-st.set_page_config(page_title="Melo Mirror Studio V51", layout="wide")
+# --- 2. RESTAURATION DES MATÉRIAUX (D8 / D9) ---
+MAT_MAP = {
+    "🍭 SUCRERIES": {
+        "jelly candy": "Translucent jelly candy (glossy), subsurface scattering",
+        "marshmallow": "Marshmallow foam (matte soft), squishy appearance",
+        "chocolate": "Chocolate tri-blend (milk, dark, white - marble effect)",
+        "fondant": "Smooth sugar fondant (matte)",
+        "candy cane": "Striped polished candy cane"
+    },
+    "🧶 TEXTILES": {
+        "felted wool": "Felted wool fabric, soft fibers",
+        "velvet": "Velvet microfabric, deep sheen",
+        "crochet": "Hand-knitted wool crochet pattern",
+        "corduroy": "Ridged corduroy fabric texture"
+    },
+    "🧩 JOUETS": {
+        "lego": "Lego plastic ABS, high gloss",
+        "clay": "Soft hand-modeled clay (matte)",
+        "tin metal": "Vintage painted tin toy metal",
+        "toy wood": "Polished toy wood, rounded edges"
+    }
+}
 
-# Style CSS pour l'identité visuelle des modes
-st.markdown("""
-    <style>
-    .stSelectbox div[data-baseweb="select"] { border: 1px solid #007BFF; }
-    .auto-label { color: #007BFF; font-weight: bold; font-size: 0.9em; margin-bottom: -10px; }
-    .manual-label { color: #FF4B4B; font-weight: bold; font-size: 0.9em; margin-bottom: -10px; }
-    </style>
-    """, unsafe_allow_html=True)
+# --- 3. RESTAURATION DES DESTINATIONS (80 LIEUX) ---
+# (Extrait représentatif, la structure permet d'en ajouter 80)
+DESTINATIONS = {
+    "paris": {"nom": "Paris (France)", "landmark": "Eiffel Tower", "lieux": {
+        1: {"nom": "Le Trocadéro", "cue": "Eiffel Tower clearly recognizable. Setting: Le Trocadéro."},
+        2: {"nom": "Les Quais de Seine", "cue": "Eiffel Tower recognizable. Setting: Les Quais de Seine."},
+        3: {"nom": "Au pied de la Tour", "cue": "Eiffel Tower recognizable. Setting: Au pied de la Tour."},
+        4: {"nom": "Pelouse du Champ-de-Mars", "cue": "Eiffel Tower recognizable. Setting: Pelouse du Champ-de-Mars."}}},
+    "santorin": {"nom": "Santorin (Grèce)", "landmark": "Blue Domes", "lieux": {
+        1: {"nom": "Ruelles d'Oia", "cue": "White-washed walls, blue domes. Setting: Oia."},
+        2: {"nom": "Vue sur la Caldeira", "cue": "Volcanic bay, deep blue sea. Setting: Caldera."},
+        3: {"nom": "L'Église au dôme", "cue": "Famous blue dome church. Setting: Church."},
+        4: {"nom": "Terrasse au coucher", "cue": "Classic Santorini sunset view. Setting: Terrace."}}}
+}
 
-# --- 2. LOGIQUE DE CALCUL DES DONNÉES AUTOMATIQUES (PROD) ---
-def get_prod_settings(p_id):
-    # DÉCOR
-    b5_idx = (p_id - 1) // 5
-    b7_list = ["Golden Hour", "Blue Hour", "Sunset", "Deep Night"]
-    b7_val = b7_list[p_id % 4]
-    # IMAGE
-    paws_list = ["relaxed", "sitting", "walking", "one paw raised"]
-    expr_list = ["curious", "amazed", "smiling", "sleepy"]
-    paws_val = paws_list[p_id % 4]
-    expr_val = expr_list[p_id % 4]
-    # VIDÉO
-    act_list = ["Slow breathing", "Looking around", "Soft floating", "Gentle swaying"]
-    act_val = act_list[p_id % 4]
+# --- 4. LOGIQUE MIROIR (AUTO vs MANUEL) ---
+def get_auto_data(p_id):
+    # Logique de sélection automatique basée sur le Plan ID
+    b5_idx = (p_id - 1) // 5 
+    angles = ["wide-angle lens", "macro-cinematography", "ground level camera", "eye-level perspective"]
+    lights = ["Golden Hour", "Blue Hour", "Cinematic Sunset", "Soft Moonlight"]
+    vibes = ["calm and poetic", "mysterious", "joyful", "nostalgic"]
     
     return {
-        "b5": b5_idx, "b7": b7_val,
-        "paws": paws_val, "expr": expr_val,
-        "action": act_val
+        "b5": b5_idx + 1,
+        "b6": angles[p_id % 4],
+        "b7": lights[p_id % 4],
+        "b8": vibes[p_id % 4]
     }
 
-# --- 3. SIDEBAR ---
+# --- 5. INTERFACE ---
+st.set_page_config(page_title="Melo Mirror V52", layout="wide")
+
 with st.sidebar:
     st.title("🎬 STUDIO MÉLO ULTRA")
-    st.success("🟢 Vertex Engine Connected")
-    e7_bool = st.toggle("🕹️ ACTIVER CONTRÔLE MANUEL (E7)", value=False)
-    
+    e7_bool = st.toggle("🕹️ CONTRÔLE MANUEL (E7)", value=False)
     st.divider()
-    # On imagine ici les 20 destinations (Paris, Santorin, etc.)
-    DESTINATIONS = {"paris": {"nom": "Paris (France)", "landmark": "Eiffel Tower", "lieux": {1:{"nom":"Trocadéro","cue":"..."}, 2:{"nom":"Seine","cue":"..."}, 3:{"nom":"Tour","cue":"..."}, 4:{"nom":"Champ-de-Mars","cue":"..."}}}}
     v_id = st.selectbox("DESTINATION (B9)", list(DESTINATIONS.keys()), format_func=lambda x: DESTINATIONS[x]['nom'])
     p_id = st.select_slider("NUMÉRO DU PLAN", options=list(range(1, 21)))
     
-    prod = get_prod_settings(p_id)
+    prod = get_auto_data(p_id)
     ville = DESTINATIONS[v_id]
 
-# --- 4. AUTHENTIFICATION ---
-def init_vertex():
-    if "gcp_service_account" in st.secrets:
-        creds = service_account.Credentials.from_service_account_info(st.secrets["gcp_service_account"])
-        aiplatform.init(project="melo-prompt-generator", location="us-central1", credentials=creds)
-        return True
-    return False
-
-# --- 5. INTERFACE PRINCIPALE ---
 st.title(f"📍 {ville['nom']} — Plan {p_id}")
-mode_tag = '<p class="manual-label">🔴 MODE MANUEL (ÉDITION LIBRE)</p>' if e7_bool else '<p class="auto-label">🔵 MODE AUTO (CONTRÔLE PROD)</p>'
-st.markdown(mode_tag, unsafe_allow_html=True)
+mode_color = "#FF4B4B" if e7_bool else "#007BFF"
+mode_text = "🔴 MODE DIRECTEUR (ÉDITION)" if e7_bool else "🔵 MODE PRODUCTION (AUTO-LOCK)"
+st.markdown(f'<p style="color:{mode_color}; font-weight:bold;">{mode_text}</p>', unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (FOND)", "🎨 2. IMAGE (PERSOS)", "🎞️ 3. VIDÉO"])
 
@@ -76,56 +87,72 @@ tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (FOND)", "🎨 2. IMAGE (PERSOS)"
 with tab1:
     c1, c2, c3 = st.columns(3)
     with c1:
-        b5_f = st.selectbox("LIEU (B5)", [1,2,3,4], index=prod['b5'], disabled=not e7_bool)
-        b6_f = st.selectbox("ANGLE (B6)", ["wide-angle lens", "macro", "ground"], disabled=not e7_bool)
-    with c2:
-        b7_list = ["Golden Hour", "Blue Hour", "Sunset", "Deep Night"]
-        b7_f = st.selectbox("LUMIÈRE (B7)", b7_list, index=b7_list.index(prod['b7']), disabled=not e7_bool)
-        b8_f = st.selectbox("AMBIANCE (B8)", ["calm", "mysterious"], disabled=not e7_bool)
-    with c3:
-        d8_f = st.selectbox("MATIÈRE D8", ["marshmallow", "jelly candy", "felted wool"], disabled=not e7_bool)
-        b10_f = st.text_input("SOL (B10)", "soft tactile textures", disabled=not e7_bool)
-
-    prompt_d = f"Environment: {ville['nom']}. Light: {b7_f}. Angle: {b6_f}. Material: {d8_f}. Ground: {b10_f} --ar 16:9"
-    st.code(prompt_d)
-    if st.button("🚀 RENDU DÉCOR"):
-        st.info("Vertex AI: Génération Imagen 3 en cours...")
-
-# --- TAB 2 : IMAGE ---
-with tab2:
-    st.subheader("Les 8 Sélecteurs de Personnages")
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        p_list = ["relaxed", "sitting", "walking", "one paw raised"]
-        s_paws = st.selectbox("1. Paws/Pose", p_list, index=p_list.index(prod['paws']), disabled=not e7_bool)
-        e_list = ["curious", "amazed", "smiling", "sleepy"]
-        s_expr = st.selectbox("2. Expression", e_list, index=e_list.index(prod['expr']), disabled=not e7_bool)
-    with c2:
-        s_ppose = st.selectbox("3. Pipo Pose", ["floating", "orbiting"], disabled=not e7_bool)
-        s_ppos = st.selectbox("4. Pipo Position", ["near head", "on shoulder"], disabled=not e7_bool)
-    with c3:
-        s_acc = st.text_input("5. Accessoire", "Red Beret", disabled=not e7_bool)
-        s_pal = st.selectbox("6. Palette", ["Natural", "Pastel"], disabled=not e7_bool)
-    with c4:
-        s_pcol = st.selectbox("7. Pipo Color", ["Iridescent White", "Pure Pearl"], disabled=not e7_bool)
-        s_en = st.selectbox("8. Energy Trail", ["Soft glow", "Ribbon"], disabled=not e7_bool)
-
-    prompt_i = f"Integration: MÉLO ({DNA_MELO}) and PIPO ({DNA_PIPO}). Pose: {s_paws}. Expr: {s_expr}. Acc: {s_acc}. Trail: {s_en}. {TECH_LOCKS}"
-    st.code(prompt_i)
-    if st.button("🚀 RENDU MÉLO & PIPO"):
-        st.info("Vertex AI: Intégration Personnages...")
-
-# --- TAB 3 : VIDÉO ---
-with tab3:
-    st.subheader("Paramètres de Mouvement")
-    v1, v2, v3 = st.columns(3)
-    with v1:
-        act_list = ["Slow breathing", "Looking around", "Soft floating", "Gentle swaying"]
-        v_act = st.selectbox("Mouvement", act_list, index=act_list.index(prod['action']), disabled=not e7_bool)
-    with v2:
-        v_trail = st.selectbox("Énergie Pipo", ["Soft glow", "Long ribbon", "None"], disabled=not e7_bool)
-    with v3:
-        v_speed = st.selectbox("Vitesse", ["Ultra-slow", "Natural"], disabled=not e7_bool)
+        # RÉPARATION B5 : Affiche maintenant les noms au lieu des numéros
+        b5_final = st.selectbox("LIEU PRÉCIS (B5)", [1,2,3,4], 
+                                index=prod['b5']-1, 
+                                format_func=lambda x: ville['lieux'][x]['nom'],
+                                disabled=not e7_bool)
+        
+        angles_list = ["wide-angle lens", "macro-cinematography", "ground level camera", "eye-level perspective", "bird's eye view"]
+        b6_final = st.selectbox("ANGLE (B6)", angles_list, index=angles_list.index(prod['b6']), disabled=not e7_bool)
     
-    prompt_v = f"Animation (8s): {v_act}. Pipo energy: {v_trail}. Speed: {v_speed}. Perfect loop."
+    with c2:
+        lights_list = ["Golden Hour", "Blue Hour", "Cinematic Sunset", "Soft Moonlight", "Deep Night"]
+        b7_final = st.selectbox("LUMIÈRE (B7)", lights_list, index=lights_list.index(prod['b7']), disabled=not e7_bool)
+        
+        vibes_list = ["calm and poetic", "mysterious", "joyful", "nostalgic", "dramatic"]
+        b8_final = st.selectbox("AMBIANCE (B8)", vibes_list, index=vibes_list.index(prod['b8']), disabled=not e7_bool)
+    
+    with c3:
+        # RESTAURATION MATIÈRES D8/D9
+        cat = st.selectbox("CATÉGORIE MATIÈRE", list(MAT_MAP.keys()), disabled=not e7_bool)
+        d8_final = st.selectbox("MATIÈRE PRINCIPALE (D8)", list(MAT_MAP[cat].keys()), disabled=not e7_bool)
+        d9_final = st.selectbox("MATIÈRE SECONDAIRE (D9)", ["none", "frosted glass", "gold dust", "sugar coating"], disabled=not e7_bool)
+
+    b12_cue = ville['lieux'][b5_final]['cue']
+    prompt_d = f"Environment: {b12_cue}. Style: {TECH_LOCKS}. Light: {b7_final}. Angle: {b6_final}. Vibe: {b8_final}. Primary Material: {d8_final}. Secondary: {d9_final} --ar 16:9"
+    st.code(prompt_d)
+
+# --- TAB 2 : IMAGE (PERSOS) ---
+with tab2:
+    st.subheader("Les 8 Sélecteurs de Précision")
+    ic1, ic2, ic3, ic4 = st.columns(4)
+    with ic1:
+        s_paws = st.selectbox("1. Paws/Pose", ["relaxed", "sitting", "walking", "dancing", "curled up"], disabled=not e7_bool)
+        s_expr = st.selectbox("2. Expression", ["curious", "amazed", "smiling", "sleepy", "thoughtful"], disabled=not e7_bool)
+    with ic2:
+        s_ppose = st.selectbox("3. Pipo Pose", ["floating", "orbiting", "sitting", "hiding"], disabled=not e7_bool)
+        s_ppos = st.selectbox("4. Pipo Position", ["near head", "on shoulder", "on paw", "behind"], disabled=not e7_bool)
+    with ic3:
+        s_acc = st.text_input("5. Accessoire", "Red Beret", disabled=not e7_bool)
+        s_pal = st.selectbox("6. Palette", ["Natural cinematic", "Pastel tones", "Vibrant colors", "Monochrome blue"], disabled=not e7_bool)
+    with ic4:
+        s_pcol = st.selectbox("7. Pipo Color", ["Iridescent White", "Pure Pearl", "Golden Glow", "Soft Blue"], disabled=not e7_bool)
+        s_en = st.selectbox("8. Energy Trail", ["Soft glow", "Ribbon of light", "Sparkles", "None"], disabled=not e7_bool)
+
+    prompt_i = f"MÉLO ({DNA_MELO}) and PIPO ({DNA_PIPO}). Pose: {s_paws}. Expression: {s_expr}. Accessory: {s_acc}. Palette: {s_pal}. Energy: {s_en}. {TECH_LOCKS}"
+    st.code(prompt_i)
+
+# --- TAB 3 : VIDÉO (MVT) ---
+with tab3:
+    st.subheader("Sélecteurs de Mouvement")
+    vc1, vc2, vc3 = st.columns(3)
+    with vc1:
+        v_act = st.selectbox("Action principale", ["Slow breathing", "Looking around", "Soft floating", "Gentle swaying", "Blinking eyes"], disabled=not e7_bool)
+    with vc2:
+        v_trail = st.selectbox("Dynamique Énergie", ["Continuous ribbon", "Intermittent sparkles", "Static glow"], disabled=not e7_bool)
+    with vc3:
+        v_speed = st.selectbox("Vitesse temporelle", ["Ultra-slow (10% speed)", "Slow motion (50%)", "Real-time"], disabled=not e7_bool)
+
+    prompt_v = f"Video Animation: {v_act}. Pipo effect: {v_trail}. Speed: {v_speed}. Loop: True. Cinematic 4k."
     st.code(prompt_v)
+
+# --- BOUTONS DE GÉNÉRATION ---
+st.divider()
+col_btn1, col_btn2 = st.columns(2)
+with col_btn1:
+    if st.button("🚀 LANCER LE RENDU UNIQUE"):
+        st.info("Vertex AI Nanobanana Pro: Traitement du plan...")
+with col_btn2:
+    if st.button("🔥 LANCER LE BATCH PRODUCTION (x4)"):
+        st.info("Vertex AI Nanobanana Pro: Traitement de la série...")
