@@ -1,12 +1,12 @@
 import streamlit as st
 
-# --- 1. LES VERROUS DE LA BIBLE B22 (FIXES) ---
+# --- 1. CONFIGURATION DE LA BIBLE B22 & LOCKS ---
 MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes, no nose. Body: Transparent blue Glass Suit, ultra-glossy resin finish. Appendages: Long smooth blue ribbons (non-biological)."
 PIPO_DNA = "Small spirit companion (15% size), white snow-potato shape, iridescent soft glow."
 REALISM_LOCK = "Ultra-realistic cinematic PBR, natural optics, ray-traced reflections, 8k, macro-cinematography, ground level camera."
 MATERIAL_LOCK = "Melo's suit is homogeneous transparent blue jelly, no internal anatomy, high gloss, light refraction."
 
-# --- 2. BASE DE DONNÉES COMPLÈTE (Extraite de tes fichiers) ---
+# --- 2. BASE DE DONNÉES ÉTENDUE (Extraite de ton Excel) ---
 LIEUX = {
     "eiffel_paris": {"name": "Paris - Tour Eiffel", "struct": "B", "plate": "Empty stone esplanade, vast sky, blurry distant Eiffel Tower silhouette."},
     "mont_saint_michel": {"name": "Mont Saint-Michel", "struct": "B", "plate": "Vast wet sand, mirror reflections, distant blurry island silhouette."},
@@ -17,56 +17,60 @@ LIEUX = {
     "fuji_japan": {"name": "Mont Fuji - Japon", "struct": "A", "plate": "Still water, vast sky, distant blurry triangular mountain silhouette."},
     "taj_mahal_india": {"name": "Taj Mahal - Inde", "struct": "A", "plate": "Symmetrical white marble, reflecting pool, warm dusk glow, serene silhouette."},
     "giza_pyramids_egypt": {"name": "Pyramides de Gizeh", "struct": "A", "plate": "Vast sand dunes, minimalist horizon, distant blurry pyramid shape."},
-    "lapland_arctic": {"name": "Laponie - Arctique", "struct": "A", "plate": "Snowy landscape, soft aurora glow, pine trees with heavy snow, cozy night."}
+    "petra_jordan": {"name": "Petra - Jordanie", "struct": "A", "plate": "Narrow red rock corridor, sliver of starry sky, deep shadows."},
+    "statue_liberty_ny": {"name": "Statue de la Liberté - NY", "struct": "C", "plate": "Dark wooden ferry deck, foggy ocean, distant blurry torch light."},
+    "machu_picchu_peru": {"name": "Machu Picchu - Pérou", "struct": "B", "plate": "Green grass slopes, fog, distant blurry peak silhouette."},
+    "golden_gate_sf": {"name": "Golden Gate - San Francisco", "struct": "C", "plate": "Thick fog, distant blurry bridge tower, warm light."},
+    "lapland_arctic": {"name": "Laponie - Arctique", "struct": "A", "plate": "Snowy landscape, soft aurora glow, pine trees with heavy snow."}
 }
 
-# Logique des actions selon la Structure (A, B ou C) extraite de ton Plan de Réalisation
+# Logique des plans (Extraite de PLAN_DE_REALISATION)
 PLANS_LOGIC = {
-    1: {"angle": "Wide", "A": "Arrival (grey/misty landscape)", "B": "Arrival (Melo looks for Pipo)", "C": "Departure (Melo on transport)"},
-    2: {"angle": "Medium", "A": "Melo rubs his eyes", "B": "Melo searching", "C": "Melo looks ahead"},
-    5: {"angle": "Medium", "A": "Melo smiles, reaching for light", "B": "Melo laughs, catching Pipo", "C": "Melo drags his paw in water"},
-    18: {"angle": "Close-up", "A": "Huge slow yawn", "B": "Huge slow yawn", "C": "Huge slow yawn"},
-    20: {"angle": "Wide", "A": "Sleep, fade to black", "B": "Sleep, fade to black", "C": "Sleep, fade to black"}
+    1: {"angle": "Wide / Establishing", "A": "Arrival (grey/misty landscape)", "B": "Arrival (Melo looks for Pipo)", "C": "Departure (Melo on transport)"},
+    2: {"angle": "Medium shot", "A": "Melo rubs his eyes, looking for color", "B": "Melo searching", "C": "Melo looks ahead, steady"},
+    3: {"angle": "Close-up", "A": "Melo watches Pipo glow", "B": "Melo walks on tiptoes, curious", "C": "Landscape drifts slowly behind Melo"},
+    5: {"angle": "Medium shot", "A": "Melo smiles, reaching for light", "B": "Melo laughs, trying to catch Pipo", "C": "Melo drags his paw in water"},
+    10: {"angle": "Detail / POV", "A": "Melo touches a local object", "B": "Melo investigates a clue", "C": "Melo follows a light trail"},
+    18: {"angle": "Close-up", "A": "Melo makes a huge, slow yawn", "B": "Melo makes a huge, slow yawn", "C": "Melo makes a huge, slow yawn"},
+    20: {"angle": "Wide / Final", "A": "Sleep, fade to black", "B": "Sleep, fade to black", "C": "Sleep, fade to black"}
 }
 
-# --- 3. INTERFACE UTILISATEUR ---
-st.set_page_config(page_title="Mélo Prompt Engine", layout="wide")
-st.title("🎭 Les Voyages de Mélo : Générateur de Production")
+# --- 3. INTERFACE ---
+st.set_page_config(page_title="Mélo Engine Master", layout="wide")
+st.title("🎭 Les Voyages de Mélo : Prompt Engine")
 
 with st.sidebar:
-    st.header("⚙️ Configuration")
-    lieu_id = st.selectbox("Choisir la Destination", list(LIEUX.keys()), format_func=lambda x: LIEUX[x]['name'])
-    plan_id = st.select_slider("Numéro du Plan", options=[1, 2, 5, 18, 20])
+    st.header("⚙️ Paramètres")
+    lieu_id = st.selectbox("Destination", list(LIEUX.keys()), format_func=lambda x: LIEUX[x]['name'])
+    plan_id = st.select_slider("Numéro du Plan", options=list(PLANS_LOGIC.keys()))
+    
     st.divider()
     st.write(f"**Structure :** {LIEUX[lieu_id]['struct']}")
-    st.write(f"**Angle :** {PLANS_LOGIC[plan_id]['angle']}")
+    st.write(f"**Type d'Angle :** {PLANS_LOGIC[plan_id]['angle']}")
 
-# Récupération des données dynamiques
-structure = LIEUX[lieu_id]['struct']
-action_text = PLANS_LOGIC[plan_id][structure]
-plate_text = LIEUX[lieu_id]['plate']
+# Calcul des données
+struct = LIEUX[lieu_id]['struct']
+action = PLANS_LOGIC[plan_id][struct]
+plate = LIEUX[lieu_id]['plate']
 
-# --- 4. GÉNÉRATION DES 3 PROMPTS ---
-st.header(f"🎬 Plan {plan_id} à {LIEUX[lieu_id]['name']}")
+# --- 4. AFFICHAGE DES PROMPTS ---
+st.header(f"Plan {plan_id} — {LIEUX[lieu_id]['name']}")
 
-col1, col2, col3 = st.columns(3)
+c1, c2, c3 = st.columns(3)
 
-with col1:
-    st.subheader("1. Decor Plate")
-    p1 = f"An ultra-detailed cinematic environment photography of {LIEUX[lieu_id]['name']}. {plate_text} Minimalist composition, large negative space, bedtime-friendly. --ar 16:9"
-    st.info("Utiliser pour générer le décor vide.")
+with c1:
+    st.subheader("1. Decor (Plate)")
+    p1 = f"Ultra-detailed cinematic environment photography of {LIEUX[lieu_id]['name']}. {plate} Minimalist, large negative space, bedtime-friendly. --ar 16:9"
     st.code(p1, language="text")
 
-with col2:
+with c2:
     st.subheader("2. Image (Nanobanana)")
-    p2 = f"Character Integration: {MELO_DNA} and {PIPO_DNA}. Pose: {action_text}. Location: {LIEUX[lieu_id]['name']}. {PLANS_LOGIC[plan_id]['angle']} shot. [VERROUS]: {REALISM_LOCK} {MATERIAL_LOCK}. Color Spill: Glass suit reflects environment colors. --ar 16:9"
-    st.info("Utiliser avec l'Image 1 en référence.")
+    p2 = f"Character Integration: {MELO_DNA} and {PIPO_DNA}. Pose: {action}. {PLANS_LOGIC[plan_id]['angle']}. [VERROUS]: {REALISM_LOCK} {MATERIAL_LOCK}. Reflective mapping: Glass suit reflects {LIEUX[lieu_id]['name']} colors. --ar 16:9"
     st.code(p2, language="text")
 
-with col3:
+with c3:
     st.subheader("3. Vidéo (Veo 3)")
-    p3 = f"Animation (8s): {action_text} in ultra-slow motion. Inertia on Melo's ribbons. Pipo leaves a soft light trail. Consistent glossy reflections on the blue suit. Perfect loop, cinematic PBR."
-    st.info("Générer la vidéo à partir de l'Image 2.")
+    p3 = f"Animation (8s): {action} in ultra-slow motion. Inertia on Melo's ribbons. Pipo leaves a soft light trail. Persistent glossy reflections on the blue suit. Perfect loop, cinematic PBR."
     st.code(p3, language="text")
 
-st.success("✅ Tout est prêt. Copie le prompt dont tu as besoin pour ton étape de production.")
+st.info("💡 Conseil : Utilise le Prompt 1 pour fixer ton décor, puis le Prompt 2 en 'Image-to-Image' pour intégrer Mélo.")
