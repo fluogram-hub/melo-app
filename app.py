@@ -1,96 +1,103 @@
 import streamlit as st
 
-# --- 1. CONFIGURATION & ADN (BIBLE B22) ---
-MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes, no nose. Body: Transparent blue Glass Suit, ultra-glossy finish. Appendages: Long smooth blue ribbons."
+# --- 1. ADN DES PERSONNAGES (BIBLE B22) ---
+MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes, no nose. Body: Transparent blue Glass Suit, ultra-glossy resin finish. Appendages: Long smooth blue ribbons (non-biological)."
 PIPO_DNA = "Small spirit companion (15% size), white snow-potato shape, iridescent soft glow."
 VERROUS = "Ultra-realistic cinematic PBR, natural optics, ray-traced reflections, 8k, macro-cinematography, ground level camera."
 
-# --- 2. DONNÉES EXTRAITES DE TON EXCEL ---
+# --- 2. DONNÉES LIEUX ---
 LIEUX = {
     "eiffel_paris": {"name": "Paris", "struct": "B", "obj": "Red beret", "animal": "Poodle", "plate": "Empty stone esplanade, blurry distant Eiffel Tower silhouette."},
     "venice_italy": {"name": "Venise", "struct": "C", "obj": "Cat mask", "animal": "White pigeon", "plate": "Dark calm water, soft ripples, blurry palaces."},
     "lapland_arctic": {"name": "Laponie", "struct": "A", "obj": "Steaming mug", "animal": "Reindeer", "plate": "Vast white snowfield, aurora glow."}
 }
 
-PLANS_AUTO = {
-    1: {"angle": "Wide", "light": "Golden Hour", "weather": "Clear Sky"},
-    10: {"angle": "Close-up", "light": "Blue Hour", "weather": "Misty"},
-    18: {"angle": "Close-up", "light": "Deep Night", "weather": "Clear Sky"},
-    20: {"angle": "Wide", "light": "Deep Night", "weather": "Clear Sky"}
-}
+# --- 3. OPTIONS DE MISE EN SCÈNE ---
+EXPRESSIONS = ["Curiosité calme", "Sourire Duchenne", "Émerveillement", "Somnolence", "Tristesse poétique", "Concentration"]
+REGARDS = ["Droit devant", "Vers Pipo", "Vers l'horizon", "Vers le monument", "Vers l'accessoire", "Vers le sol"]
+POSES_PATTES = [
+    "Détendu (pendantes)", 
+    "Bras croisés", 
+    "Patte gauche levée (curiosité)", 
+    "Pattes derrière le dos", 
+    "S'accroche à l'accessoire", 
+    "Mains sur les hanches", 
+    "Se frotte les yeux"
+]
 
-EXPRESSIONS = ["Curiosité calme", "Sourire Duchenne", "Émerveillement", "Somnolence", "Tristesse poétique"]
-POSES = ["Assis", "Debout immobile", "Marche lente", "En lévitation légère", "Accroupi"]
-POSITIONS = ["Centre", "Règle des tiers (Gauche)", "Règle des tiers (Droite)", "Premier plan", "Arrière-plan"]
-
-# --- 3. INTERFACE ---
-st.set_page_config(page_title="Mélo Studio", layout="wide")
-st.title("🎬 Mélo Studio : Contrôle de Production")
+# --- 4. INTERFACE ---
+st.set_page_config(page_title="Mélo Director Studio", layout="wide")
+st.title("🎬 Mélo Studio : Direction d'Acteur & Anatomie")
 
 with st.sidebar:
-    st.header("🎯 Configuration de Scène")
+    st.header("🎯 Configuration")
     mode = st.radio("Mode de Génération", ["Automatique (Excel)", "Manuel (Custom)"])
     l_id = st.selectbox("Lieu", list(LIEUX.keys()), format_func=lambda x: LIEUX[x]['name'])
-    p_id = st.number_input("Numéro du Plan", min_value=1, max_value=20, value=1)
+    p_id = st.number_input("Plan n°", min_value=1, max_value=20, value=1)
     
     st.divider()
     
-    # --- LOGIQUE AUTO vs MANUEL ---
     lieu = LIEUX[l_id]
-    plan_ref = PLANS_AUTO.get(p_id, {"angle": "Medium", "light": "Sunset", "weather": "Clear Sky"})
     
     if mode == "Automatique (Excel)":
-        st.info(f"💡 Mode Auto : Paramètres issus du Plan de Réalisation.")
-        sel_light = plan_ref["light"]
-        sel_weather = plan_ref["weather"]
-        sel_expr = EXPRESSIONS[0]
+        st.info("💡 Mode Auto : Paramètres hérités du scénario.")
+        # Valeurs par défaut pour le mode auto (simulé ici)
+        sel_light, sel_weather = "Golden Hour", "Clear Sky"
+        sel_expr, sel_gaze, sel_paws = EXPRESSIONS[0], REGARDS[0], POSES_PATTES[0]
         sel_acc = lieu["obj"]
-        sel_pose = POSES[1]
-        sel_pos = POSITIONS[0]
     else:
-        st.warning("🕹️ Mode Manuel : Vous avez le contrôle.")
-        sel_light = st.selectbox("Horaire", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"], index=0)
-        sel_weather = st.selectbox("Météo", ["Clear Sky", "Heavy Rain", "Soft Snow", "Foggy"], index=0)
+        st.warning("🕹️ Mode Manuel")
+        sel_light = st.selectbox("Horaire", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night", "Dawn"])
+        sel_weather = st.selectbox("Météo", ["Clear Sky", "Heavy Rain", "Soft Snow", "Foggy"])
         sel_expr = st.selectbox("Expression de Mélo", EXPRESSIONS)
-        sel_pose = st.selectbox("Pose de Mélo", POSES)
-        sel_pos = st.selectbox("Position dans le cadre", POSITIONS)
-        sel_acc = st.text_input("Accessoire (ou laisser objet local)", value=lieu["obj"])
+        sel_gaze = st.selectbox("Où regarde Mélo ?", REGARDS)
+        sel_paws = st.selectbox("Position des pattes", POSES_PATTES)
+        sel_acc = st.text_input("Accessoire", value=lieu["obj"])
 
-# --- 4. TABLEAU DE BORD DU RÉALISATEUR ---
-st.subheader(f"Plateau : {lieu['name']} | Plan {p_id} | Structure {lieu['struct']}")
+# --- 5. TABLEAU DE BORD (CAPTURE DE PROD) ---
+st.subheader(f"Fiche de Tournage : {lieu['name']} | Plan {p_id}")
 
-# Affichage des réglages actuels pour lecture facile
-cols = st.columns(5)
-cols[0].metric("Horaire", sel_light)
-cols[1].metric("Météo", sel_weather)
-cols[2].metric("Expression", sel_expr)
-cols[3].metric("Accessoire", sel_acc)
-cols[4].metric("Position", sel_pos)
+# Affichage clair des paramètres choisis
+c1, c2, c3, c4 = st.columns(4)
+with c1:
+    st.write("**Ambiance**")
+    st.caption(f"🌅 {sel_light}")
+    st.caption(f"☁️ {sel_weather}")
+with c2:
+    st.write("**Visage**")
+    st.caption(f"🎭 {sel_expr}")
+    st.caption(f"👁️ Regard : {sel_gaze}")
+with c3:
+    st.write("**Corps**")
+    st.caption(f"🐾 {sel_paws}")
+    st.caption(f"🎒 {sel_acc}")
+with c4:
+    st.write("**Acteur 2**")
+    st.caption(f"✨ Pipo : {PIPO_DNA[:30]}...")
 
 st.divider()
 
-# --- 5. GÉNÉRATION DES PROMPTS (LISIBILITÉ MAXIMALE) ---
-melo_full_desc = f"{MELO_DNA}. Expression: {sel_expr}. Pose: {sel_pose}. Position: {sel_pos}. Accessory: {sel_acc}."
+# --- 6. GÉNÉRATION DES PROMPTS ---
+melo_anatomy = f"Pose: {sel_paws}. Gaze: looking {sel_gaze}. Expression: {sel_expr}. Accessory: {sel_acc}."
 atmo = f"{sel_light}, {sel_weather}."
 
-tab1, tab2, tab3 = st.tabs(["🖼️ 1. DECOR (PLATE)", "🎨 2. INTEGRATION (IMAGE)", "🎞️ 3. MOUVEMENT (VIDEO)"])
+tabs = st.tabs(["🖼️ 1. DECOR", "🎨 2. IMAGE", "🎞️ 3. VIDEO"])
 
-with tab1:
-    st.info("Utilisez ce prompt pour générer le décor vide (Master Plate).")
-    p1 = f"Environment Plate: {lieu['plate']} {atmo} POETIC, MINIMALIST, high-end photography. --ar 16:9"
+with tabs[0]:
+    p1 = f"Environment Plate: {lieu['plate']} {atmo} POETIC, MINIMALIST. --ar 16:9"
     st.code(p1, language="text")
 
-with tab2:
-    st.info("Utilisez ce prompt avec l'Image 1 de Mélo en 'Character Reference'.")
-    p2 = f"Integration: {melo_full_desc} and {PIPO_DNA}. Location: {lieu['name']}. {plan_ref['angle']} perspective. {atmo} [VERROUS]: {VERROUS}."
+with tabs[1]:
+    # Ici on injecte les verrous de pose et regard
+    p2 = f"Integration: {MELO_DNA}. {melo_anatomy} Companion: {PIPO_DNA}. Location: {lieu['name']}. {atmo} [VERROUS]: {VERROUS}."
     st.code(p2, language="text")
 
-with tab3:
-    st.info("Utilisez ce prompt pour animer l'image générée (Veo 3 / Runway).")
-    p3 = f"Animation (8s): Melo in {sel_pose} motion at {sel_pos}. {sel_expr} breathing. {sel_weather} particles moving slowly. Pipo trailing light. Cinematic PBR."
+with tabs[2]:
+    p3 = f"Animation (8s): Melo {melo_anatomy}. Ultra-slow motion breathing. Pipo soft light trail. {sel_weather} effects. Perfect loop, cinematic PBR."
     st.code(p3, language="text")
 
-st.markdown(f"""
-> **Notes de Mise en Scène :** > Pour ce plan à **{lieu['name']}**, Mélo est positionné en **{plan_ref['angle']}** à la position **{sel_pos}**. 
-> L'interaction est centrée sur l'expression **{sel_expr}** et l'accessoire **{sel_acc}**.
-""")
+# --- 7. RÉCAPITULATIF DE CAPTURE ---
+with st.expander("📝 Récapitulatif pour export"):
+    summary = f"LIEU: {lieu['name']} | PLAN: {p_id} | POSE: {sel_paws} | REGARD: {sel_gaze} | ACC: {sel_acc}"
+    st.text_area("Copier la fiche technique", summary)
+    
