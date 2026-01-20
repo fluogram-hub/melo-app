@@ -1,94 +1,162 @@
-import streamlit as st
-import pandas as pd
-import io
+# =========================================================
+# ZONE 1 : CONFIGURATION GLOBALE (B22)
+# =========================================================
+B22_IDENTITY_LOCK = """MÉLO (LOCK — DO NOT CHANGE):
+- MÉLO: Bunny-shaped high-end designer toy wearing a blue glossy suit with White round belly with yellow notes, white mitten-like paws.
+- Same face, proportions, materials
+- Wearing a blue glass suit (transparent blue glass effect), ultra glossy.
+- Rounded child proportions.
+- Keep ears visibility consistent.
+
+PIPO (LOCK — DO NOT CHANGE):
+- microscopic snow-potato companion; white with subtle iridescent multicolor reflections.
+- Dot eyes and small smile; not an animal.
+- Very tiny scale (≈5–10% of Mélo head height) and always close to Mélo.
+- Soft constant glow; bedtime-friendly, minimal."""
 
 # =========================================================
-# 1. INITIALISATION
+# ZONE 2 : DATA (À REMPLIR PLUS TARD - NE PAS SUPPRIMER)
 # =========================================================
-st.set_page_config(page_title="Melo Studio V71", layout="wide")
+# Placeholder pour les 80 lieux
+DB_DECORS = {
+    "eiffel_paris": {
+        "nom_fr": "La Tour Eiffel (Paris, France)",
+        "decors": {
+            1: {"fr": "Les Quais de Seine", "en": "Seine riverbanks", "cue": "Eiffel Tower clearly recognizable..."},
+            2: {"fr": "Le Trocadéro", "en": "The Trocadéro", "cue": "Ultra-realistic cinematic PBR..."},
+        }
+    }
+}
 
-if 'melo_db' not in st.session_state:
-    st.session_state.melo_db = None
+# Placeholder pour les 20 plans
+PLANS_SEQ = {
+    1: {
+        "Angle": "Establishing wide shot", "Time": "morning", "Weather": "heavy rain", "Season": "summer",
+        "M_Pose": "Melo sat on ground facing the camera", "M_Expr": "gentle connection",
+        "P_Act": "Pipo floats gently", "P_Pos": "Pipo very close to Melo",
+        "Acc": "flower", "Palette": "Dreamy Pastel", "P_Col": "Warm glow", "Trail": "sparkling dust trail",
+        "V_Mode": "Non-loop cinematic", "V_Act": "Simple gesture", "V_M_Mvt": "Slow walk",
+        "V_P_Mvt": "Slow circular float", "V_Cam": "Slow orbit", "V_Env": "Tiny dust particles", "V_Trans": "None"
+    }
+}
+
+# Placeholder pour les 22 matières
+MAT_MAP = {
+    "🍭 SUCRERIES": ["Translucent colored jelly candy (glossy)", "Marshmallow foam"],
+    "🧶 TEXTILES": ["Felted wool fabric", "Velvet microfabric"],
+    "🧩 JOUETS": ["Lego", "Soft clay (matte)"]
+}
 
 # =========================================================
-# 2. CHARGEMENT
+# ZONE 3 : LOGIQUE DE L'INTERFACE
 # =========================================================
+st.set_page_config(page_title="Melo Production V71", layout="wide")
+
 with st.sidebar:
     st.title("🎬 STUDIO MÉLO")
-    file = st.file_uploader("Étape 1 : Charger l'Excel", type="xlsx")
+    e7_bool = st.toggle("🕹️ ACTIVER MODE MANUEL (E7)", value=False)
     
-    if file and st.session_state.melo_db is None:
-        try:
-            xl = pd.ExcelFile(file)
-            st.session_state.melo_db = {
-                "lieux": xl.parse("BASE_LIEUX"),
-                "plans": xl.parse("PLAN_DE_REALISATION"),
-                "lists": xl.parse("Lists")
-            }
-            st.rerun()
-        except Exception as e:
-            st.error(f"Erreur d'ouverture : {e}")
-
-if not st.session_state.melo_db:
-    st.info("👋 En attente du fichier Excel...")
-    st.stop()
-
-# --- RÉCUPÉRATION ---
-df_lieux = st.session_state.melo_db["lieux"]
-df_plans = st.session_state.melo_db["plans"]
-df_lists = st.session_state.melo_db["lists"]
-
-# =========================================================
-# 3. BARRE LATÉRALE (PILOTAGE)
-# =========================================================
-with st.sidebar:
     st.divider()
-    e7_bool = st.toggle("🕹️ MODE MANUEL", value=False)
+    v_id = st.selectbox("DESTINATION (B9)", list(DB_DECORS.keys()), format_func=lambda x: DB_DECORS[x]['nom_fr'])
+    p_id = st.select_slider("NUMÉRO DU PLAN", options=list(range(1, 21)))
     
-    # 1. Sélection de la Destination
-    v_id = st.selectbox("DESTINATION (B9)", df_lieux['LieuKey'].unique())
-    
-    # 2. Sélection du Plan
-    p_id = st.select_slider("NUMÉRO DU PLAN", options=df_plans['Plan_ID'].unique())
+    # Synchro Auto
+    ville = DB_DECORS[v_id]
+    plan = PLANS_SEQ.get(p_id, PLANS_SEQ[1])
+    auto_b5_id = ((p_id - 1) % 4) + 1
 
-    # --- LOGIQUE DÉCOR PRÉCIS (E5) ---
-    # On cherche la colonne qui contient "Decor" dans son nom
-    decor_col = next((c for c in df_lists.columns if 'decor' in c.lower()), None)
-    
-    if decor_col:
-        all_val = df_lists[decor_col].dropna().astype(str).tolist()
-        # On filtre les décors qui contiennent l'ID de la ville
-        clean_names = [v.split('–')[-1].split('-')[-1].strip() for v in all_val if v_id.lower() in v.lower()]
-        
-        if clean_names:
-            auto_idx = ((p_id - 1) % len(clean_names))
-            e5_val = st.selectbox("📍 DÉCOR PRÉCIS (E5)", clean_names, index=auto_idx, disabled=not e7_bool)
-        else:
-            st.warning(f"Pas de décor trouvé pour {v_id}")
-            e5_val = "Inconnu"
-    else:
-        st.error("Colonne 'Decor' introuvable dans l'onglet Lists")
-        e5_val = "Erreur"
-
-    st.divider()
-    sc_ver = st.radio("VARIANTE", ["A", "B", "C"])
+tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (ENV)", "🎨 2. IMAGE (PERSOS)", "🎞️ 3. VIDÉO"])
 
 # =========================================================
-# 4. AFFICHAGE (ONGLET 1)
+# ZONE 4 : ONGLET 1 - DÉCOR (Prompt 1 XLSX)
 # =========================================================
-tab1, tab2, tab3 = st.tabs(["🖼️ DÉCOR", "🎨 IMAGE", "🎞️ VIDÉO"])
-
 with tab1:
-    st.header(f"Lieu : {e5_val}")
-    st.write(f"Destination parente : {v_id}")
-    
-    # On génère le prompt final pour que tu puisses voir si ça marche
-    st.subheader("📝 Prompt généré :")
-    prompt = f"Cinematic shot of {e5_val} in {v_id}. Ultra-realistic, 8k."
-    st.code(prompt)
+    st.subheader("⚙️ Paramètres du Décor")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        b5_val = st.selectbox("DÉCOR (E5)", list(ville['decors'].keys()), index=0, format_func=lambda x: ville['decors'][x]['fr'], disabled=not e7_bool)
+        b6_val = st.selectbox("ANGLE (B6/I34)", ["Establishing wide shot", "Medium shot", "Close-up"], index=0, disabled=not e7_bool)
+        b9_val = st.selectbox("SAISON (B9)", ["summer", "winter", "spring", "autumn"], index=0, disabled=not e7_bool)
+    with c2:
+        b7_val = st.selectbox("TIME OF DAY (B7/I35)", ["morning", "sunset", "night"], index=0, disabled=not e7_bool)
+        b8_val = st.selectbox("WEATHER (B8)", ["heavy rain", "clear sky", "soft mist"], index=0, disabled=not e7_bool)
+        b11_val = st.selectbox("1ER PLAN (B11)", ["none", "wild flowers", "leaves"], disabled=not e7_bool)
+    with c3:
+        d8_val = st.selectbox("MATÉRIEL D8", [m for sub in MAT_MAP.values() for m in sub], disabled=not e7_bool)
+        d9_val = st.selectbox("MATÉRIEL D9", ["none", "Crystal sugar glow"], disabled=not e7_bool)
+        b10_val = st.text_input("ÉTAT DU SOL (B10)", value="paved", disabled=not e7_bool)
 
+    # FORMULE PROMPT 1
+    e5_en = ville['decors'][b5_val]['en']
+    b12_cue = ville['decors'][b5_val]['cue']
+    d9_str = f" and {d9_val}" if d9_val != "none" else ""
+    b11_str = f"In the immediate foreground, a subtle {b11_val} adds volumetric depth; " if b11_val != "none" else ""
+    sugar = "sugar-coated crystalline textures" if "candy" in d8_val.lower() else "polished finishes"
+
+    prompt_1 = (f"An ultra-detailed cinematic environment photography of {e5_en}. "
+                f"The scene is set in {b9_val} during the {b7_val}, with a {b8_val} atmosphere. "
+                f"The camera uses a {b6_val} with a low-angle ground perspective. {b11_str}"
+                f"MATERIAL WORLD & SHADING: All surfaces reimagined in {d8_val}{d9_str}. "
+                f"Surfaces feature realistic subsurface scattering and {sugar}. COMPOSITION: Minimalist. "
+                f"GROUND DETAIL: {b10_val}. PLATE CUES (STRICT): {b12_cue}. RULES: Pure background plate.")
+    st.code(prompt_1)
+
+# =========================================================
+# ZONE 5 : ONGLET 2 - IMAGE (Prompt 2 XLSX)
+# =========================================================
 with tab2:
-    # Récupération de l'action Mélo
-    plan_data = df_plans[df_plans['Plan_ID'] == p_id].iloc[0]
-    action_col = f"{sc_ver}_Melo_Action_EN"
-    st.info(f"Action Mélo : {plan_data.get(action_col, 'Non trouvée')}")
+    st.subheader("🎨 Intégration Personnages")
+    r1, r2, r3, r4 = st.columns(4)
+    with r1:
+        s_pose = st.text_area("1. Pose Mélo (FR)", value=plan['M_Pose'], disabled=not e7_bool)
+        s_expr = st.text_area("2. Expression de Mélo", value=plan['M_Expr'], disabled=not e7_bool)
+    with r2:
+        s_p_act = st.text_area("3. Pose Pipo (FR)", value=plan['P_Act'], disabled=not e7_bool)
+        s_p_pos = st.text_input("4. Position Pipo (FR)", value=plan['P_Pos'], disabled=not e7_bool)
+    with r3:
+        s_acc = st.text_input("5. Melo Accessory", value=plan['Acc'], disabled=not e7_bool)
+        s_pal = st.selectbox("6. Color Palette", ["Dreamy Pastel", "Natural"], disabled=not e7_bool)
+    with r4:
+        s_pcol = st.selectbox("7. Pipo Color", ["Warm glow", "Iridescent"], disabled=not e7_bool)
+        s_trail = st.selectbox("8. Pipo Energy Trail", ["sparkling dust trail", "none"], disabled=not e7_bool)
+
+    # Logique Météo
+    weather_interaction = ""
+    if any(word in b8_val.lower() for word in ["rain", "snow", "mist", "frost"]):
+        weather_interaction = f"Add realistic water droplets or frost streaks on Mélo's glossy glass suit that reflect the {b7_val} light."
+
+    prompt_2 = (f"IMAGE COMPOSITING TASK: Using Image 3 background, integrate Mélo and Pipo.\n\n"
+                f"1. IDENTITY LOCK: {B22_IDENTITY_LOCK}. Accessory: {s_acc}.\n"
+                f"2. LIGHTING: Palette: {s_pal}. Light must bounce onto Mélo’s glass suit. Material: {d8_val}. Trail: {s_trail}.\n"
+                f"3. PHYSICAL INTERACTION: Condition: {b8_val}. {weather_interaction}\n"
+                f"4. SCENE DIRECTION: Pose: {s_pose}. Expression: {s_expr}. Pipo: {s_p_act} at {s_p_pos}.")
+    st.code(prompt_2)
+
+# =========================================================
+# ZONE 6 : ONGLET 3 - VIDÉO (Prompt 3 XLSX)
+# =========================================================
+with tab3:
+    st.subheader("🎞️ Paramètres Vidéo")
+    v1, v2, v3 = st.columns(3)
+    with v1:
+        vm = st.selectbox("1. Mode vidéo", ["Non-loop cinematic", "Perfect loop"], disabled=not e7_bool)
+        va = st.selectbox("2. Type d’action", ["Simple gesture", "Still pose"], disabled=not e7_bool)
+    with v2:
+        vmm = st.selectbox("3. Mouvement de Mélo", ["Slow walk", "Breathing only"], disabled=not e7_bool)
+        vpm = st.selectbox("4. Mouvement de Pipo", ["Slow circular float", "Tiny bounce"], disabled=not e7_bool)
+    with v3:
+        vcam = st.selectbox("5. Mouvement caméra", ["Slow orbit", "Locked camera"], disabled=not e7_bool)
+        venv = st.selectbox("6. Mouvement environnement", ["Tiny dust particles", "None"], disabled=not e7_bool)
+
+    prompt_3 = (f"VIDEO GENERATION PROMPT (FLOW / VEO3)\nMODE: Animate existing pixels. No reinterpretation.\n"
+                f"SCENE LOCK: Angle: {b6_val}. Time: {b7_val}. Trail: {s_trail}.\n"
+                f"REALISM LOCK: Material: {d8_val}. Duration: 8s. Mode: {vm}. Action: {va}. Melo: {vmm}. Pipo: {vpm}. Cam: {vcam}. Env: {venv}.\n"
+                f"LOOP RULES: If mode = Perfect loop, motion must be continuous.")
+    st.code(prompt_3)
+
+# =========================================================
+# ZONE 7 : MOTEUR RENDU
+# =========================================================
+st.divider()
+if st.button("🚀 RENDU VERTEX ULTRA"):
+    st.info("Connexion Vertex AI Imagen 3...")
