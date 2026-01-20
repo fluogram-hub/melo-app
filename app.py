@@ -21,6 +21,7 @@ PLANS_AUTO = {
 
 EXPRESSIONS = ["Curiosité calme", "Sourire Duchenne", "Émerveillement", "Somnolence", "Tristesse poétique"]
 POSES = ["Assis", "Debout immobile", "Marche lente", "En lévitation légère", "Accroupi"]
+POSITIONS = ["Centre", "Règle des tiers (Gauche)", "Règle des tiers (Droite)", "Premier plan", "Arrière-plan"]
 
 # --- 3. INTERFACE ---
 st.set_page_config(page_title="Mélo Studio", layout="wide")
@@ -45,28 +46,31 @@ with st.sidebar:
         sel_expr = EXPRESSIONS[0]
         sel_acc = lieu["obj"]
         sel_pose = POSES[1]
+        sel_pos = POSITIONS[0]
     else:
         st.warning("🕹️ Mode Manuel : Vous avez le contrôle.")
         sel_light = st.selectbox("Horaire", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"], index=0)
         sel_weather = st.selectbox("Météo", ["Clear Sky", "Heavy Rain", "Soft Snow", "Foggy"], index=0)
         sel_expr = st.selectbox("Expression de Mélo", EXPRESSIONS)
         sel_pose = st.selectbox("Pose de Mélo", POSES)
+        sel_pos = st.selectbox("Position dans le cadre", POSITIONS)
         sel_acc = st.text_input("Accessoire (ou laisser objet local)", value=lieu["obj"])
 
 # --- 4. TABLEAU DE BORD DU RÉALISATEUR ---
 st.subheader(f"Plateau : {lieu['name']} | Plan {p_id} | Structure {lieu['struct']}")
 
 # Affichage des réglages actuels pour lecture facile
-cols = st.columns(4)
+cols = st.columns(5)
 cols[0].metric("Horaire", sel_light)
 cols[1].metric("Météo", sel_weather)
 cols[2].metric("Expression", sel_expr)
 cols[3].metric("Accessoire", sel_acc)
+cols[4].metric("Position", sel_pos)
 
 st.divider()
 
 # --- 5. GÉNÉRATION DES PROMPTS (LISIBILITÉ MAXIMALE) ---
-melo_full_desc = f"{MELO_DNA}. Expression: {sel_expr}. Pose: {sel_pose}. Accessory: {sel_acc}."
+melo_full_desc = f"{MELO_DNA}. Expression: {sel_expr}. Pose: {sel_pose}. Position: {sel_pos}. Accessory: {sel_acc}."
 atmo = f"{sel_light}, {sel_weather}."
 
 tab1, tab2, tab3 = st.tabs(["🖼️ 1. DECOR (PLATE)", "🎨 2. INTEGRATION (IMAGE)", "🎞️ 3. MOUVEMENT (VIDEO)"])
@@ -83,10 +87,10 @@ with tab2:
 
 with tab3:
     st.info("Utilisez ce prompt pour animer l'image générée (Veo 3 / Runway).")
-    p3 = f"Animation (8s): Melo in {sel_pose} motion. {sel_expr} breathing. {sel_weather} particles moving slowly. Pipo trailing light. Cinematic PBR."
+    p3 = f"Animation (8s): Melo in {sel_pose} motion at {sel_pos}. {sel_expr} breathing. {sel_weather} particles moving slowly. Pipo trailing light. Cinematic PBR."
     st.code(p3, language="text")
 
 st.markdown(f"""
-> **Notes de Mise en Scène :** > Pour ce plan à **{lieu['name']}**, Mélo est positionné en **{plan_ref['angle']}**. 
-> L'interaction est centrée sur l'accessoire **{sel_acc}**.
+> **Notes de Mise en Scène :** > Pour ce plan à **{lieu['name']}**, Mélo est positionné en **{plan_ref['angle']}** à la position **{sel_pos}**. 
+> L'interaction est centrée sur l'expression **{sel_expr}** et l'accessoire **{sel_acc}**.
 """)
