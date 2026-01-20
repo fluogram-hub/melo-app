@@ -1,11 +1,11 @@
 import streamlit as st
 
-# --- 1. ADN & LOCKS (BIBLE B22 - ANGLAIS POUR L'IA) ---
+# --- 1. ADN & LOCKS (BIBLE B22) ---
 MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes. Body: Transparent blue Glass Suit, ultra-glossy finish. Appendages: Long blue ribbons."
 PIPO_DNA = "Small white spirit companion, snow-potato shape, iridescent soft glow."
 VERROUS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera, ray-traced reflections."
 
-# --- 2. BASE DE DONNÉES : 4 DÉCORS PAR VILLE ---
+# --- 2. BASE DE DONNÉES : DÉCORS PAR VILLE ---
 DESTINATIONS = {
     "eiffel_paris": {
         "nom": "Paris - Tour Eiffel", "struct": "B", "obj_fr": "Béret rouge", "obj_en": "Red beret",
@@ -27,25 +27,33 @@ DESTINATIONS = {
     }
 }
 
-# --- 3. LES 20 PLANS COMPLETS (ACTIONS FR/EN) ---
-# Chaque plan de 1 à 20 est maintenant défini.
-PLANS_DATA = {}
-for i in range(1, 21):
-    if i <= 5: ang, light_ui, light_en = "Wide", "Aube dorée", "Golden Hour"
-    elif i <= 10: ang, light_ui, light_en = "Medium", "Coucher du Soleil", "Sunset"
-    elif i <= 15: ang, light_ui, light_en = "Close-up", "Heure Bleue", "Blue Hour"
-    else: ang, light_ui, light_en = "Wide", "Nuit Profonde", "Deep Night"
-    
-    # Remplissage générique des actions pour l'exemple (à affiner avec tes phrases exactes)
-    PLANS_DATA[i] = {
-        "angle": ang, "light_ui": light_ui, "light_en": light_en,
-        "A_M_FR": f"Action Plan {i} (Structure A)", "A_M_EN": f"Action Plan {i} (A)",
-        "B_M_FR": f"Action Plan {i} (Structure B)", "B_M_EN": f"Action Plan {i} (B)",
-        "C_M_FR": f"Action Plan {i} (Structure C)", "C_M_EN": f"Action Plan {i} (C)"
-    }
+# --- 3. LES 20 PLANS RÉELS (ACTIONS DÉTAILLÉES) ---
+# Ici, chaque plan a une action unique pour la Structure B (Paris) et C (Venise)
+PLANS_DATA = {
+    1: {"light_ui": "Aube", "light_en": "Golden Hour", "B_FR": "Arrive et cherche Pipo du regard", "B_EN": "Arrival, looking for Pipo", "C_FR": "Départ sur le transport", "C_EN": "Departure on transport"},
+    2: {"light_ui": "Matin", "light_en": "Morning", "B_FR": "Se frotte les yeux avec étonnement", "B_EN": "Rubs eyes with wonder", "C_FR": "Regarde l'horizon défiler", "C_EN": "Watching the horizon drift"},
+    3: {"light_ui": "Matin", "light_en": "Morning", "B_FR": "Marche sur la pointe des pieds", "B_EN": "Walking on tiptoes", "C_FR": "S'accroche au rebord du transport", "C_EN": "Holding onto the transport edge"},
+    4: {"light_ui": "Midi", "light_en": "High Noon", "B_FR": "Découvre un indice au sol", "B_EN": "Finds a clue on the ground", "C_FR": "Suit une lueur dans l'eau", "C_EN": "Following a glow in the water"},
+    5: {"light_ui": "Midi", "light_en": "High Noon", "B_FR": "Rit aux éclats avec Pipo", "B_EN": "Laughing out loud with Pipo", "C_FR": "Laisse traîner sa patte dans l'eau", "C_EN": "Dragging paw in the water"},
+    6: {"light_ui": "Après-midi", "light_en": "Afternoon", "B_FR": "Explore le nouvel espace", "B_EN": "Exploring the new space", "C_FR": "Passe sous un pont sombre", "C_EN": "Passing under a dark bridge"},
+    7: {"light_ui": "Après-midi", "light_en": "Afternoon", "B_FR": "Observe le changement de ciel", "B_EN": "Watching the sky change", "C_FR": "Regarde les reflets sur les murs", "C_EN": "Watching reflections on walls"},
+    8: {"light_ui": "Après-midi", "light_en": "Afternoon", "B_FR": "Manipule l'accessoire {obj}", "B_EN": "Handling the {obj}", "C_FR": "Joue avec l'accessoire {obj}", "C_EN": "Playing with the {obj}"},
+    9: {"light_ui": "Fin de journée", "light_en": "Late Afternoon", "B_FR": "S'assoit pour admirer la vue", "B_EN": "Sits to admire the view", "C_FR": "Le transport ralentit doucement", "C_EN": "Transport slowing down gently"},
+    10: {"light_ui": "Coucher Soleil", "light_en": "Sunset", "B_FR": "Visage illuminé par le monument", "B_EN": "Face lit by the landmark", "C_FR": "Émerveillement total devant la lumière", "C_EN": "Total wonder at the light"},
+    11: {"light_ui": "Crépuscule", "light_en": "Dusk", "B_FR": "Prend une pause avec Pipo", "B_EN": "Taking a break with Pipo", "C_FR": "Observe le monument au loin", "C_EN": "Watching the landmark in the distance"},
+    12: {"light_ui": "Crépuscule", "light_en": "Dusk", "B_FR": "Le jeu se calme", "B_EN": "Playtime ends calmly", "C_FR": "S'approche du quai final", "C_EN": "Approaching the final dock"},
+    13: {"light_ui": "Heure Bleue", "light_en": "Blue Hour", "B_FR": "Regarde un animal dormir", "B_EN": "Watching a sleeping animal", "C_FR": "Regarde un animal dormir", "C_EN": "Watching a sleeping animal"},
+    14: {"light_ui": "Heure Bleue", "light_en": "Blue Hour", "B_FR": "Reste immobile et serein", "B_EN": "Standing still and serene", "C_FR": "Se relaxe contre le rebord", "C_EN": "Relaxing against the edge"},
+    15: {"light_ui": "Nuit", "light_en": "Night", "B_FR": "Le monument scintille", "B_EN": "The landmark sparkles", "C_FR": "Le transport s'arrête", "C_EN": "The transport stops"},
+    16: {"light_ui": "Nuit", "light_en": "Night", "B_FR": "Prépare un coin douillet", "B_EN": "Preparing a cozy corner", "C_FR": "S'installe pour la nuit", "C_EN": "Settling in for the night"},
+    17: {"light_ui": "Nuit", "light_en": "Night", "B_FR": "Ferme doucement les yeux", "B_EN": "Gently closing eyes", "C_FR": "Ferme doucement les yeux", "C_EN": "Gently closing eyes"},
+    18: {"light_ui": "Nuit", "light_en": "Night", "B_FR": "Fait un énorme bâillement", "B_EN": "Huge slow yawn", "C_FR": "Fait un énorme bâillement", "C_EN": "Huge slow yawn"},
+    19: {"light_ui": "Nuit", "light_en": "Night", "B_FR": "Paysage paisible final", "B_EN": "Final peaceful landscape", "C_FR": "Paysage paisible final", "C_EN": "Final peaceful landscape"},
+    20: {"light_ui": "Nuit", "light_en": "Night", "B_FR": "Sommeil profond", "B_EN": "Deep sleep", "C_FR": "Sommeil profond", "C_EN": "Deep sleep"}
+}
 
-# --- 4. STYLE & INTERFACE ---
-st.set_page_config(page_title="Mélo Studio Contextuel", layout="wide")
+# --- 4. STYLE CSS ---
+st.set_page_config(page_title="Mélo Contextual Studio", layout="wide")
 st.markdown("""
     <style>
     .info-card { background-color: #f8f9fa; border-left: 5px solid #007BFF; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
@@ -54,7 +62,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 5. SIDEBAR ---
+# --- 5. SIDEBAR (LOGIQUE DYNAMIQUE) ---
 with st.sidebar:
     st.title("🎬 CONFIGURATION")
     mode = st.radio("Mode de contrôle", ["🤖 AUTOMATIQUE", "🕹️ MANUEL"])
@@ -65,41 +73,32 @@ with st.sidebar:
     plan = PLANS_DATA[p_id]
     struct = ville['struct']
     
-    # LOGIQUE DE CHANGEMENT DE DÉCOR (1 décor pour 5 plans)
+    # CALCUL DÉCOR ET ACTION
     d_id = (p_id - 1) // 5 + 1
     
     if mode == "🤖 AUTOMATIQUE":
         s_decor_ui = ville['decors'][d_id]['ui']
         s_decor_en = ville['decors'][d_id]['en']
-        s_action_fr = plan[f"{struct}_M_FR"]
-        s_action_en = plan[f"{struct}_M_EN"]
+        s_action_fr = plan[f"{struct}_FR"].format(obj=ville['obj_fr'])
+        s_action_en = plan[f"{struct}_EN"].format(obj=ville['obj_en'])
         s_light_ui, s_light_en = plan['light_ui'], plan['light_en']
-        s_weather_ui, s_weather_en = "Ciel Dégagé", "Clear Sky"
         s_paws_fr, s_paws_en = "Détendu", "relaxed"
         s_gaze_fr, s_gaze_en = "Vers l'horizon", "horizon"
-        s_acc_fr, s_acc_en = ville['obj_fr'], ville['obj_en']
-        s_expr_fr, s_expr_en = "Émerveillement", "amazed"
     else:
         st.warning("🕹️ MODE MANUEL")
         manual_d = st.selectbox("Décor", [1,2,3,4], index=d_id-1, format_func=lambda x: ville['decors'][x]['ui'])
         s_decor_ui = ville['decors'][manual_d]['ui']
         s_decor_en = ville['decors'][manual_d]['en']
-        s_action_fr = st.text_input("Action (FR)", value=plan[f"{struct}_M_FR"])
-        s_action_en = plan[f"{struct}_M_EN"]
-        s_light_ui = st.selectbox("Horaire", ["Aube", "Coucher Soleil", "Heure Bleue", "Nuit"])
+        s_action_fr = st.text_input("Action (FR)", value=plan[f"{struct}_FR"].format(obj=ville['obj_fr']))
+        s_action_en = plan[f"{struct}_EN"].format(obj=ville['obj_en'])
+        s_light_ui = st.selectbox("Horaire", ["Aube", "Coucher Soleil", "Nuit"])
         s_light_en = "Golden Hour"
-        s_weather_ui = st.selectbox("Météo", ["Beau temps", "Pluie", "Neige"])
-        s_weather_en = "Clear Sky"
         s_paws_fr = st.selectbox("Pattes", ["Détendu", "Patte levée", "Bras croisés"])
         s_paws_en = "one paw raised"
         s_gaze_fr = st.selectbox("Regard", ["Droit devant", "Vers Pipo", "Vers l'horizon"])
         s_gaze_en = "straight ahead"
-        s_acc_fr = st.text_input("Accessoire", value=ville['obj_fr'])
-        s_acc_en = ville['obj_en']
-        s_expr_fr = "Manuel"
-        s_expr_en = "manual"
 
-# --- 6. ZONE DE TRAVAIL CONTEXTUELLE ---
+# --- 6. ZONE DE TRAVAIL ---
 st.title(f"📍 {ville['nom']} — Plan {p_id}")
 
 tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (PLATE)", "🎨 2. IMAGE (INTEGRATION)", "🎞️ 3. VIDÉO (MOUVEMENT)"])
@@ -107,33 +106,25 @@ tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (PLATE)", "🎨 2. IMAGE (INTEGRA
 with tab1:
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown(f'<div class="info-card"><div class="action-title">📍 DÉCOR ACTUEL (Plan {p_id})</div><div class="action-text">{s_decor_ui}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card"><div class="action-title">📍 DÉCOR DU PLAN {p_id}</div><div class="action-text">{s_decor_ui}</div></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown(f'<div class="info-card"><div class="action-title">🌅 AMBIANCE LUMINEUSE</div><div class="action-text">{s_light_ui} | {s_weather_ui}</div></div>', unsafe_allow_html=True)
-    
-    st.subheader("Prompt Decor (English)")
-    st.code(f"Environment Plate: {s_decor_en} Time: {s_light_en}. Weather: {s_weather_en}. POETIC, MINIMALIST. --ar 16:9")
+        st.markdown(f'<div class="info-card"><div class="action-title">🌅 LUMIÈRE</div><div class="action-text">{s_light_ui}</div></div>', unsafe_allow_html=True)
+    st.code(f"Environment: {s_decor_en} | Light: {s_light_en}")
 
 with tab2:
+    # ICI LES INFOS DOIVENT CHANGER DYNAMIQUEMENT
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown(f'<div class="info-card"><div class="action-title">🎭 ANATOMIE</div><div class="action-text">{s_paws_fr}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card"><div class="action-title">🎭 ACTION DÉTECTÉE</div><div class="action-text">{s_action_fr}</div></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown(f'<div class="info-card"><div class="action-title">👁️ REGARD</div><div class="action-text">{s_gaze_fr}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card"><div class="action-title">🐾 ANATOMIE</div><div class="action-text">{s_paws_fr}</div></div>', unsafe_allow_html=True)
     with c3:
-        st.markdown(f'<div class="info-card"><div class="action-title">🎒 ACCESSOIRE</div><div class="action-text">{s_acc_fr}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card"><div class="action-title">👁️ REGARD</div><div class="action-text">{s_gaze_fr}</div></div>', unsafe_allow_html=True)
 
-    st.subheader("Prompt Intégration (English)")
-    p2 = f"Integration: {MELO_DNA}. Pose: {s_paws_en}. Looking {s_gaze_en}. Action: {s_action_en}. Holding: {s_acc_en}. Decor: {s_decor_ui}. {s_light_en}. {VERROUS}."
+    st.subheader("Prompt Image")
+    p2 = f"Integration: {MELO_DNA}. Pose: {s_paws_en}. Looking {s_gaze_en}. Action: {s_action_en}. In: {s_decor_ui}. {s_light_en}. {VERROUS}."
     st.code(p2)
 
 with tab3:
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown(f'<div class="info-card"><div class="action-title">🎞️ MOUVEMENT VIDÉO</div><div class="action-text">{s_action_fr}</div></div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown(f'<div class="info-card"><div class="action-title">🚀 EFFETS</div><div class="action-text">Ultra-slow motion | Particules {s_weather_ui}</div></div>', unsafe_allow_html=True)
-
-    st.subheader("Prompt Animation (English)")
-    p3 = f"Animation (8s): {s_action_en} in ultra-slow motion. {s_weather_en} particles. Melo in {s_decor_ui}. Perfect loop."
-    st.code(p3)
+    st.markdown(f'<div class="info-card"><div class="action-title">🎞️ MOUVEMENT VIDÉO</div><div class="action-text">{s_action_fr}</div></div>', unsafe_allow_html=True)
+    st.code(f"Animation (8s): {s_action_en} in ultra-slow motion. Perfect loop.")
