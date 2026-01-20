@@ -1,99 +1,117 @@
 import streamlit as st
 
 # --- 1. ADN MÉLO & PIPO (BIBLE B22) ---
-MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes. Body: Transparent blue Glass Suit, ultra-glossy finish. Appendages: Long blue ribbons."
-PIPO_DNA = "Small spirit companion, white snow-potato shape, iridescent soft glow."
+MELO_DNA = "45cm luxury designer toy, humanoid, round head, black dot eyes. Body: Transparent blue Glass Suit, ultra-glossy finish. Appendages: Long smooth blue ribbons."
+PIPO_DNA = "Small white spirit companion, snow-potato shape, iridescent soft glow."
 VERROUS = "Ultra-realistic cinematic PBR, 8k, macro-cinematography, ground level camera, ray-traced reflections."
 
-# --- 2. BASE DE DONNÉES DES DÉCORS (Extraite de ton Excel) ---
-# J'ai structuré ici les 4 lieux par destination
+# --- 2. BASE DE DONNÉES DES LIEUX & DÉCORS (Extraite de tes fichiers) ---
 DESTINATIONS = {
     "eiffel_paris": {
-        "name": "Paris - Tour Eiffel", "struct": "B", "obj": "Béret rouge", "animal": "Caniche",
+        "name": "Paris", "struct": "B", "obj": "Béret rouge", "animal": "Caniche",
         "decors": {
-            1: {"name": "Le Trocadéro", "plate": "Eiffel Tower silhouette, stone esplanade, warm distant streetlamps bokeh."},
-            2: {"name": "Les Quais de Seine", "plate": "River banks, cobble stones, Eiffel Tower reflected in the water."},
-            3: {"name": "Au pied de la Tour", "plate": "Close-up of the iron lattice structure, low angle, ground level."},
-            4: {"name": "Pelouse du Champ-de-Mars", "plate": "Green grass, distant Eiffel Tower, soft focus trees."}
+            1: {"name": "Le Trocadéro", "plate": "Eiffel Tower silhouette, stone esplanade, warm streetlamps bokeh."},
+            2: {"name": "Les Quais de Seine", "plate": "River banks, cobble stones, Eiffel Tower reflected in water."},
+            3: {"name": "Le Pied de la Tour", "plate": "Low angle iron lattice, ground level view."},
+            4: {"name": "Champ-de-Mars", "plate": "Green grass, distant tower, soft focus trees."}
         }
     },
     "venice_italy": {
-        "name": "Venise - Italie", "struct": "C", "obj": "Masque de chat", "animal": "Pigeon blanc",
+        "name": "Venise", "struct": "C", "obj": "Masque de chat", "animal": "Pigeon blanc",
         "decors": {
-            1: {"name": "Le Grand Canal", "plate": "Calm green water, historic facades, gondola silhouette."},
-            2: {"name": "La Petite Ruelle", "plate": "Narrow stone street, soft lantern light, historic walls."},
-            3: {"name": "La Place Saint-Marc", "plate": "Vast paved square, Byzantine architecture, soft blue hour light."},
-            4: {"name": "L'Intérieur de la Gondole", "plate": "Dark wood textures, water ripples nearby, velvet seats."}
+            1: {"name": "Le Grand Canal", "plate": "Calm water, gondola silhouette, historic palaces."},
+            2: {"name": "Le Pont des Soupirs", "plate": "Narrow canal, stone bridge, soft reflections."},
+            3: {"name": "Place Saint-Marc", "plate": "Paved square, Byzantine arches, blue hour light."},
+            4: {"name": "Intérieur Gondole", "plate": "Dark wood, velvet, ripples visible nearby."}
+        }
+    },
+    "lapland_arctic": {
+        "name": "Laponie", "struct": "A", "obj": "Chocolat chaud", "animal": "Renne",
+        "decors": {
+            1: {"name": "Forêt de Sapins", "plate": "Heavy snow, pine silhouettes, aurora glow."},
+            2: {"name": "Extérieur Igloo", "plate": "Snow dome, warm light from entrance, starry sky."},
+            3: {"name": "Le Traîneau", "plate": "Wooden sled, thick fur blankets, snowy path."},
+            4: {"name": "Intérieur Igloo", "plate": "Ice walls, soft warm glow, cozy atmosphere."}
         }
     }
 }
 
-# --- 3. LES 20 PLANS (ACTIONS) ---
-PLANS_ACTIONS = {
-    1: {"angle": "Wide", "action": "Arrivée dans le paysage", "pipo": "Flotte à côté"},
-    5: {"angle": "Medium", "action": "Sourit et tend la patte", "pipo": "Lueur douce"},
-    10: {"angle": "Close-up", "action": "Observe l'accessoire local", "pipo": "Cercle l'objet"},
-    18: {"angle": "Close-up", "action": "Fait un énorme bâillement lent", "pipo": "Reste très proche"},
-    20: {"angle": "Wide", "action": "S'endort paisiblement", "pipo": "S'éteint doucement"}
+# --- 3. LES 20 PLANS RÉELS (Extraits de ton PLAN_DE_REALISATION) ---
+PLANS_DATA = {
+    1: {"angle": "Wide", "light": "Golden Hour", "A": "Arrival (misty)", "B": "Arrival (searching for Pipo)", "C": "Departure (on transport)"},
+    2: {"angle": "Medium", "light": "Golden Hour", "A": "Rubs eyes", "B": "Rubs eyes, searching", "C": "Looks ahead steady"},
+    3: {"angle": "Close-up", "light": "Sunset", "A": "Watches Pipo glow", "B": "Walks on tiptoes", "C": "Landscape drifts behind"},
+    4: {"angle": "POV", "light": "Sunset", "A": "Looks at detail", "B": "Sees a clue", "C": "Follows light cue"},
+    5: {"angle": "Medium", "light": "Sunset", "A": "Reaches for light", "B": "Laughs with Pipo", "C": "Drags paw in water"},
+    6: {"angle": "Wide", "light": "Dusk", "A": "Watches Pipo fly", "B": "Searches the space", "C": "Passes under arch"},
+    7: {"angle": "Detail", "light": "Dusk", "A": "Notices sky change", "B": "Peeks through hole", "C": "Follows small glow"},
+    8: {"angle": "Medium", "light": "Dusk", "A": "Uses {obj}", "B": "Uses {obj}", "C": "Plays with {obj}"},
+    9: {"angle": "Wide", "light": "Dusk", "A": "Watches monument shift", "B": "Enters calm space", "C": "Slows down observing"},
+    10: {"angle": "Close-up", "light": "Blue Hour", "A": "Face in awe", "B": "Looks amazed", "C": "Eyelids heavy"},
+    11: {"angle": "Wide", "light": "Night", "A": "Watches stars", "B": "Quiet break with Pipo", "C": "Landmark in distance"},
+    12: {"angle": "Wide", "light": "Night", "A": "Slows, softening", "B": "Game ends calmly", "C": "Approaches slowly"},
+    13: {"angle": "Close-up", "light": "Night", "A": "Sees {animal} sleeping", "B": "Sees {animal} sleeping", "C": "Sees {animal} sleeping"},
+    14: {"angle": "Medium", "light": "Night", "A": "Stands calmly", "B": "Stands calmly", "C": "Relaxes"},
+    15: {"angle": "Detail", "light": "Night", "A": "Landmark twinkles", "B": "Landmark sparkles", "C": "Transport stops"},
+    16: {"angle": "Medium", "light": "Night", "A": "Prepares sleeping spot", "B": "Finds cozy corner", "C": "Settles to sleep"},
+    17: {"angle": "Close-up", "light": "Night", "A": "Relaxes", "B": "Relaxes", "C": "Relaxes"},
+    18: {"angle": "Close-up", "light": "Night", "A": "Huge slow yawn", "B": "Huge slow yawn", "C": "Huge slow yawn"},
+    19: {"angle": "Wide", "light": "Night", "A": "Peaceful landscape", "B": "Peaceful landscape", "C": "Peaceful landscape"},
+    20: {"angle": "Wide", "light": "Night", "A": "Sleep / black", "B": "Sleep / black", "C": "Sleep / black"}
 }
 
 # --- 4. INTERFACE ---
-st.set_page_config(page_title="Mélo Studio Pro", layout="wide")
-st.title("🎬 Studio Mélo : Gestion des Décors & Plans")
+st.set_page_config(page_title="Mélo 160s Studio", layout="wide")
+st.title("🎭 Mélo & Pipo : Production Automatique 20 Plans")
 
 with st.sidebar:
-    st.header("📍 Configuration")
-    mode = st.radio("Contrôle", ["🤖 AUTOMATIQUE", "🕹️ MANUEL"])
+    st.header("⚙️ Pilotage")
     ville_id = st.selectbox("Destination", list(DESTINATIONS.keys()), format_func=lambda x: DESTINATIONS[x]['name'])
-    plan_id = st.number_input("Plan (1 à 20)", 1, 20, 1)
+    p_id = st.select_slider("Numéro du Plan (1-20)", options=list(PLANS_DATA.keys()))
     
-    # Logique automatique de sélection du décor (1 décor pour 5 plans)
-    auto_decor_id = (plan_id - 1) // 5 + 1
+    st.divider()
     
     ville = DESTINATIONS[ville_id]
+    plan_info = PLANS_DATA[p_id]
+    struct = ville['struct']
     
-    if mode == "🤖 AUTOMATIQUE":
-        decor_id = auto_decor_id
-        st.success(f"Mode Auto : Décor {decor_id} sélectionné.")
-    else:
-        decor_id = st.selectbox("Choisir le Décor spécifique", [1, 2, 3, 4], format_func=lambda x: ville['decors'][x]['name'])
+    # Détermination AUTO du décor (tous les 5 plans)
+    decor_id = (p_id - 1) // 5 + 1
+    decor = ville['decors'][decor_id]
+    
+    # Action auto basée sur la Structure (A, B ou C)
+    action_melo = plan_info[struct].format(obj=ville['obj'], animal=ville['animal'])
 
-    st.divider()
-    h_val = st.selectbox("Horaire", ["Golden Hour", "Sunset", "Blue Hour", "Deep Night"])
-    m_val = st.selectbox("Météo", ["Clear Sky", "Heavy Rain", "Soft Snow", "Misty"])
+    st.success(f"Mode AUTO : Plan {p_id} détecté.")
+    st.info(f"Structure {struct} | Décor {decor_id} ({decor['name']})")
 
-# --- 5. RÉCAPITULATIF ---
-decor = ville['decors'][decor_id]
-action_ref = PLANS_ACTIONS.get(plan_id, PLANS_ACTIONS[1])
+# --- 5. DASHBOARD DE PRODUCTION ---
+st.header(f"Plan {p_id} : {ville['name']} — {decor['name']}")
 
-st.markdown(f"### 📍 Destination : {ville['name']}")
-st.markdown(f"#### 🎥 Scène actuelle : **{decor['name']}** (Décor {decor_id}/4)")
-
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.info(f"**Action MÉLO**\n\n{action_ref['action']}")
-with c2:
-    st.info(f"**Action PIPO**\n\n{action_ref['pipo']}")
-with c3:
-    st.info(f"**Angle**\n\n{action_ref['angle']}")
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("ACTION MÉLO", action_melo)
+with col2:
+    st.metric("HORAIRE", plan_info['light'])
+with col3:
+    st.metric("ANGLE", plan_info['angle'])
 
 st.divider()
 
 # --- 6. PROMPTS ---
-tab1, tab2, tab3 = st.tabs(["[ 1. FOND ]", "[ 2. IMAGE ]", "[ 3. VIDÉO ]"])
+tab1, tab2, tab3 = st.tabs(["🖼️ 1. DÉCOR (PLATE)", "🎨 2. IMAGE (INTEGRATION)", "🎞️ 3. VIDÉO (MOUVEMENT)"])
 
 with tab1:
-    st.write("### 🖼️ Prompt Décor (Master Plate)")
-    p1 = f"Environment Plate: {decor['plate']} Time: {h_val}. Weather: {m_val}. POETIC, MINIMALIST. --ar 16:9"
+    st.write("### Prompt Décor")
+    p1 = f"Environment Plate: {decor['plate']} Time: {plan_info['light']}. POETIC, MINIMALIST. --ar 16:9"
     st.code(p1, language="text")
 
 with tab2:
-    st.write("### 🎨 Prompt Intégration (Nanobanana)")
-    # Intégration explicite du nom du décor
-    p2 = f"Integration: {MELO_DNA} in {decor['name']}. Action: {action_ref['action']}. Companion: {PIPO_DNA}. Location: {ville['name']}. {h_val}, {m_val}. [VERROUS]: {VERROUS}. --ar 16:9"
+    st.write("### Prompt Nanobanana")
+    p2 = f"Integration: {MELO_DNA}. Action: {action_melo}. Decor: {decor['name']}. Location: {ville['name']}. {plan_info['light']}. [VERROUS]: {VERROUS}. --ar 16:9"
     st.code(p2, language="text")
 
 with tab3:
-    st.write("### 🎞️ Prompt Animation (Veo 3)")
-    p3 = f"Animation (8s): {action_ref['action']} in ultra-slow motion. Melo in {decor['name']}. Pipo trailing soft light. {m_val} effects. Perfect loop, cinematic PBR."
+    st.write("### Prompt Veo 3")
+    p3 = f"Animation (8s): {action_melo} in ultra-slow motion. Melo in {decor['name']}. Pipo companion nearby. {plan_info['light']}. Perfect loop, cinematic PBR."
     st.code(p3, language="text")
